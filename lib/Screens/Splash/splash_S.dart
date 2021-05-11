@@ -1,7 +1,9 @@
-import 'package:bp/Screens/login_S.dart';
+import 'package:bp/Components/customButton.dart';
+import 'package:bp/Screens/log%20in/login_S.dart';
 import 'package:bp/colors.dart';
 import 'package:bp/size_config.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 
 class SplashScreen extends StatefulWidget {
   SplashScreen({Key key}) : super(key: key);
@@ -20,15 +22,15 @@ class _SplashScreenState extends State<SplashScreen> {
 
     List<Map<String, String>> splashData = [
       {
-        "image": "assets/images/time.png",
+        "image": "assets/images/time.svg",
         "text": "Bienvenido a BENUS. No pierdas el Tiempo",
       },
       {
-        "image": "assets/images/notify.png",
+        "image": "assets/images/notify.svg",
         "text": "Podras ver la lista de las personas en turno",
       },
       {
-        "image": "assets/images/notification.png",
+        "image": "assets/images/alert.svg",
         "text": "Seras notificado cada cuando se aserque tu turno",
       },
     ];
@@ -66,39 +68,23 @@ class _SplashScreenState extends State<SplashScreen> {
                 ),
               ),
             ),
-            buttonPage()
+            CustomButton(
+                text: 'Continuar',
+                pressd: () {
+                  Navigator.pushReplacementNamed(context, LoginPage.routeName);
+                },
+                context: context)
           ],
         ),
       ),
     );
   }
 
-  TextButton buttonPage() {
-    return TextButton(
-        onPressed: () {
-          Navigator.pushReplacementNamed(context, LoginPage.routeName);
-        },
-        child: Container(
-          width: 250,
-          height: 40,
-          decoration: BoxDecoration(
-              color: kSecundary, borderRadius: BorderRadius.circular(20)),
-          child: Center(
-            child: Text(
-              'Continuar',
-              style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold),
-            ),
-          ),
-        ));
-  }
-
-  Container buildDot(int index) {
-    return Container(
+  AnimatedContainer buildDot(int index) {
+    return AnimatedContainer(
+      duration: Duration(milliseconds: 200),
       margin: EdgeInsets.only(right: 8),
-      width: currentPage == index ? 45 : 12,
+      width: currentPage == index ? 40 : 12,
       height: 12,
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(5),
@@ -134,7 +120,7 @@ class SplashContent extends StatelessWidget {
           text,
           style: TextStyle(color: kPrimeryColor),
         ),
-        Image.asset(
+        SvgPicture.asset(
           image,
           height: getPSH(420),
         ),
