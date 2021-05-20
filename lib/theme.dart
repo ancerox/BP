@@ -11,5 +11,5 @@ ThemeData themedata() {
           elevation: 0,
           color: kBackGColor),
       scaffoldBackgroundColor: kBackGColor,
-      fontFamily: 'Kohinoor Bangla');
+      fontFamily: 'Inter');
 }
