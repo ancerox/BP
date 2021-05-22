@@ -1,5 +1,6 @@
 import 'package:bp/Components/BackButton.dart';
 import 'package:bp/Components/Hour.dart';
+import 'package:bp/Components/appbar.dart';
 import 'package:bp/colors.dart';
 import 'package:bp/size_config.dart';
 import 'package:flutter/material.dart';
@@ -83,7 +84,7 @@ class _DateTimePageState extends State<DateTimePage>
               child: Column(
                 children: [
                   //
-                  appbar(),
+                  appbar(context, text: 'Servicios en lista'),
                   //
                   TabBar(
                       isScrollable: true,
@@ -201,24 +202,5 @@ class _DateTimePageState extends State<DateTimePage>
               ],
             ),
           );
-  }
-
-  Widget appbar() {
-    return Row(
-      children: [
-        CustomBackButton(),
-        Spacer(),
-        Text(
-          'Servicios en lista',
-          style: TextStyle(
-              fontSize: getPSH(20),
-              color: kPrimeryColor,
-              fontWeight: FontWeight.w800),
-        ),
-        Spacer(
-          flex: 2,
-        ),
-      ],
-    );
   }
 }

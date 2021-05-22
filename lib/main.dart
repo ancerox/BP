@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'Screens/HomePage/Home_page.dart';
+import 'Screens/ServicesStylists/services_Stylists_page.dart';
 import 'Screens/Splash/splash_S.dart';
 
 void main() {
@@ -24,6 +25,6 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         theme: themedata(),
         title: 'Material App',
-        home: DateTimePage());
+        home: ServicesStylists());
   }
 }
