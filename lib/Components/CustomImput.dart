@@ -45,14 +45,6 @@ Widget customImput({
             fontSize: 0,
           ),
           floatingLabelBehavior: FloatingLabelBehavior.always,
-          // errorBorder: UnderlineInputBorder(
-          //   borderSide: BorderSide(color: Colors.blue, width: 1.0),
-          // ),
-          // errorStyle:
-          //     focusNode.hasFocus ? TextStyle(fontSize: 0, height: 0) : null,
-          // focusedErrorBorder: UnderlineInputBorder(
-          //   borderSide: BorderSide.none,
-          // ),
           contentPadding: EdgeInsets.symmetric(horizontal: 35, vertical: 10),
           hintStyle: TextStyle(fontSize: getPSW(15)),
           hintText: hintText,

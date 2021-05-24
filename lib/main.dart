@@ -1,19 +1,17 @@
-import 'package:bp/Screens/center/center_page.dart';
-import 'package:bp/Screens/codeSms/CodeSms_S.dart';
-import 'package:bp/Screens/dateTime/dateTime_Screen.dart';
-import 'package:bp/colors.dart';
+import 'package:bp/Screens/Register/Register_P.dart';
+
 import 'package:bp/routes.dart';
-import 'package:bp/size_config.dart';
+import 'package:bp/services/user_services.dart';
+
 import 'package:bp/theme.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 
-import 'Screens/HomePage/Home_page.dart';
-import 'Screens/ServicesStylists/services_Stylists_page.dart';
-import 'Screens/Splash/splash_S.dart';
-import 'Screens/lobby/lobby_page.dart';
-
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   SystemChrome.setSystemUIOverlayStyle(
       SystemUiOverlayStyle(statusBarBrightness: Brightness.light));
   runApp(MyApp());
@@ -22,11 +20,18 @@ void main() {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-        routes: routes,
-        debugShowCheckedModeBanner: false,
-        theme: themedata(),
-        title: 'Material App',
-        home: LobbyPage());
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (_) => new UserServices(),
+        )
+      ],
+      child: MaterialApp(
+          routes: routes,
+          debugShowCheckedModeBanner: false,
+          theme: themedata(),
+          title: 'Material App',
+          home: RegisterPage()),
+    );
   }
 }

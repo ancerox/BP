@@ -27,7 +27,7 @@ class _LobbyPageState extends State<LobbyPage> {
               flex: 2,
               child: CircularCountDownTimer(
                 hora: '9:00AM',
-                duration: 7,
+                duration: 2000,
                 initialDuration: 0,
                 controller: CountDownController(),
                 width: MediaQuery.of(context).size.width / 1.8,

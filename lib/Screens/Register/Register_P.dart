@@ -3,10 +3,12 @@ import 'package:bp/Components/customButton.dart';
 
 import 'package:bp/Screens/codeSms/CodeSms_S.dart';
 import 'package:bp/Screens/log%20in/login_S.dart';
+import 'package:bp/services/user_services.dart';
 import 'package:flutter/material.dart';
 import 'package:bp/colors.dart';
 import 'package:bp/size_config.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 
 import 'errosStrings.dart';
 
@@ -54,6 +56,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 textAlign: TextAlign.center,
               ),
               SizedBox(height: SizeConfig.screenHeight * 0.03),
+              //  Inputs
               InputsRegister(),
               Row(
                 children: [
@@ -66,9 +69,8 @@ class _RegisterPageState extends State<RegisterPage> {
                 children: [
                   Text('Ya tienes una cuenta?'),
                   TextButton(
-                    onPressed: () {
-                      Navigator.pushNamed(context, LoginPage.routeName);
-                    },
+                    onPressed: () =>
+                        Navigator.pushNamed(context, LoginPage.routeName),
                     child: Text(
                       'Inicia Seccion',
                       style: TextStyle(
@@ -88,10 +90,6 @@ class _RegisterPageState extends State<RegisterPage> {
 }
 
 class InputsRegister extends StatefulWidget {
-  const InputsRegister({
-    Key key,
-  }) : super(key: key);
-
   @override
   _InputsRegisterState createState() => _InputsRegisterState();
 }
@@ -103,11 +101,11 @@ class _InputsRegisterState extends State<InputsRegister> {
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   //
   TextEditingController repeatPassCtrl = TextEditingController();
+  TextEditingController _emailController = TextEditingController();
+  TextEditingController _passWordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
-    RegExp regExp = RegExp(r"^[a-zA-Z0-9.]+@[a-zA-Z0-9]+\.[a-zA-Z]+");
-
     return Form(
       key: _formKey,
       child: Column(
@@ -162,6 +160,7 @@ class _InputsRegisterState extends State<InputsRegister> {
 
                 return null;
               },
+              textController: _emailController,
               hintText: 'Correo Electronico',
               icon: Icons.mail,
               isPassword: false,
@@ -222,9 +221,9 @@ class _InputsRegisterState extends State<InputsRegister> {
               //
               context: context,
               pressd: () {
-                // print(repeatPassCtrl.text);
                 if (_formKey.currentState.validate()) {
-                  Navigator.pushReplacementNamed(context, SmsPage.route);
+                  Provider.of<UserServices>(context,listen: false)
+                      .registerUser(_emailController.text, repeatPassCtrl.text);
                 } else {
                   print('error');
                 }
