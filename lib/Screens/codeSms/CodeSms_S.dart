@@ -1,7 +1,14 @@
 import 'package:bp/Components/customButton.dart';
+import 'package:bp/Screens/HomePage/Home_page.dart';
+import 'package:bp/Screens/Register/Register_P.dart';
 import 'package:bp/colors.dart';
+import 'package:bp/services/user_services.dart';
+import 'package:bp/size_config.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:pinput/pin_put/pin_put.dart';
+import 'package:provider/provider.dart';
 
 class SmsPage extends StatefulWidget {
   SmsPage({Key key}) : super(key: key);
@@ -10,6 +17,8 @@ class SmsPage extends StatefulWidget {
   @override
   _SmsPageState createState() => _SmsPageState();
 }
+
+TextEditingController _smsControler = TextEditingController();
 
 final BoxDecoration pinPutDecoration = BoxDecoration(
   color: const Color.fromRGBO(43, 46, 66, 1),
@@ -35,7 +44,22 @@ class _SmsPageState extends State<SmsPage> {
               // CustomButton(text: 'text', context: context, pressd: () {}),
               inputCode(),
               TextButton(
-                  onPressed: () {},
+                  onPressed: () async {
+                    verifyUser();
+                    // FirebaseAuth _auth = FirebaseAuth.instance;
+                    // final provider =
+                    //     Provider.of<UserServices>(context, listen: false);
+
+                    // PhoneAuthCredential phoneAuthCredential =
+                    //     PhoneAuthProvider.credential(
+                    //         verificationId: provider.varId,
+                    //         smsCode: _smsControler.text);
+
+                    // _auth.signInWithCredential(phoneAuthCredential);
+
+                    // Navigator.pushReplacementNamed(
+                    //     context, RegisterPage.routeName);
+                  },
                   child: Container(
                       height: 50,
                       width: 400,
@@ -44,7 +68,7 @@ class _SmsPageState extends State<SmsPage> {
                           color: kSecundary),
                       child: Center(
                           child: Text(
-                        'probando',
+                        'Verificar',
                         style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 20,
@@ -62,17 +86,48 @@ class _SmsPageState extends State<SmsPage> {
       padding: EdgeInsets.all(40.0),
       child: PinPut(
         fieldsCount: 6,
-        textStyle: const TextStyle(fontSize: 25.0, color: Colors.white),
-        eachFieldWidth: 40.0,
-        eachFieldHeight: 55.0,
+        textStyle: const TextStyle(fontSize: 25, color: Colors.white),
+        eachFieldWidth: getPSW(40.0),
+        eachFieldHeight: getPSH(55.0),
         focusNode: FocusNode(),
-        // controller: _smsControler,
+        controller: _smsControler,
         submittedFieldDecoration: pinPutDecoration,
         selectedFieldDecoration: pinPutDecoration,
         followingFieldDecoration: pinPutDecoration,
         pinAnimationType: PinAnimationType.fade,
       ),
     );
+  }
+
+  verifyUser() async {
+    final _fireStore = FirebaseFirestore.instance;
+    final provider = Provider.of<UserServices>(context, listen: false);
+
+    final auth = FirebaseAuth.instance;
+    final User user = auth.currentUser;
+
+    PhoneAuthCredential phoneAuthCredential = PhoneAuthProvider.credential(
+        verificationId: provider.varId, smsCode: _smsControler.text);
+
+    await auth.signInWithCredential(phoneAuthCredential);
+
+    await _fireStore
+        .collection('user')
+        .where('cellPhone', isEqualTo: provider.phoneNum)
+        .get()
+        .then((value) {
+      if (value.docs.length > 0) {
+        Navigator.pushNamedAndRemoveUntil(
+            context, HomePage.route, (route) => false);
+      } else {
+        Navigator.pushNamedAndRemoveUntil(
+            context, RegisterPage.routeName, (route) => false);
+        // final auth = FirebaseAuth.instance;
+        // final User user = auth.currentUser;
+        // final uid = user.linkWithCredential(credential);
+        // print(uid);
+      }
+    });
   }
 }
 

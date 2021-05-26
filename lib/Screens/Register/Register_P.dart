@@ -1,9 +1,12 @@
 import 'package:bp/Components/CustomImput.dart';
 import 'package:bp/Components/customButton.dart';
+import 'package:bp/Screens/HomePage/Home_page.dart';
 
 import 'package:bp/Screens/codeSms/CodeSms_S.dart';
 import 'package:bp/Screens/log%20in/login_S.dart';
+
 import 'package:bp/services/user_services.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:bp/colors.dart';
 import 'package:bp/size_config.dart';
@@ -58,29 +61,24 @@ class _RegisterPageState extends State<RegisterPage> {
               SizedBox(height: SizeConfig.screenHeight * 0.03),
               //  Inputs
               InputsRegister(),
-              Row(
-                children: [
-                  Checkbox(value: false, onChanged: (value) {}),
-                  Text('Acepto los terminos y condiciones'),
-                ],
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text('Ya tienes una cuenta?'),
-                  TextButton(
-                    onPressed: () =>
-                        Navigator.pushNamed(context, LoginPage.routeName),
-                    child: Text(
-                      'Inicia Seccion',
-                      style: TextStyle(
-                          fontSize: getPSW(12),
-                          fontWeight: FontWeight.bold,
-                          color: kPrimeryColor),
-                    ),
-                  ),
-                ],
-              ),
+
+              // Row(
+              //   mainAxisAlignment: MainAxisAlignment.center,
+              //   children: [
+              //     Text('Ya tienes una cuenta?'),
+              //     TextButton(
+              //       onPressed: () =>
+              //           Navigator.pushNamed(context, LoginPage.routeName),
+              //       child: Text(
+              //         'Inicia Seccion',
+              //         style: TextStyle(
+              //             fontSize: getPSW(12),
+              //             fontWeight: FontWeight.bold,
+              //             color: kPrimeryColor),
+              //       ),
+              //     ),
+              //   ],
+              // ),
             ],
           ),
         ),
@@ -102,7 +100,7 @@ class _InputsRegisterState extends State<InputsRegister> {
   //
   TextEditingController repeatPassCtrl = TextEditingController();
   TextEditingController _emailController = TextEditingController();
-  TextEditingController _passWordController = TextEditingController();
+  TextEditingController _nameCtrl = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -111,6 +109,7 @@ class _InputsRegisterState extends State<InputsRegister> {
       child: Column(
         children: [
           customImput(
+              textController: _nameCtrl,
               onChanged: (value) {
                 if (value.isNotEmpty) {
                   setState(() {
@@ -212,6 +211,12 @@ class _InputsRegisterState extends State<InputsRegister> {
               icon: Icons.lock_rounded,
               isPassword: true,
               keyboardType: TextInputType.emailAddress),
+          Row(
+            children: [
+              Checkbox(value: false, onChanged: (value) {}),
+              Text('Acepto los terminos y condiciones'),
+            ],
+          ),
           Column(
             children: List.generate(errorList.length,
                 (index) => textsErros(error: errorList[index])),
@@ -220,17 +225,27 @@ class _InputsRegisterState extends State<InputsRegister> {
               text: 'Registrase',
               //
               context: context,
-              pressd: () {
+              pressd: () async {
                 if (_formKey.currentState.validate()) {
-                  Provider.of<UserServices>(context,listen: false)
-                      .registerUser(_emailController.text, repeatPassCtrl.text);
-                } else {
-                  print('error');
+                  register();
                 }
               }),
         ],
       ),
     );
+  }
+
+  void register() async {
+    final provider = Provider.of<UserServices>(context, listen: false);
+    await provider.registerUser(
+        _emailController.text, repeatPassCtrl.text, _nameCtrl.text);
+
+    Navigator.popAndPushNamed(context, HomePage.route);
+    // return userCreds;
+
+    // print(userCreds);
+
+    // print(userCreds);
   }
 
   Row textsErros({String error}) {

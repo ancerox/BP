@@ -1,4 +1,5 @@
 import 'package:bp/Screens/Register/Register_P.dart';
+import 'package:bp/Screens/log%20in/login_S.dart';
 
 import 'package:bp/routes.dart';
 import 'package:bp/services/user_services.dart';
@@ -31,7 +32,7 @@ class MyApp extends StatelessWidget {
           debugShowCheckedModeBanner: false,
           theme: themedata(),
           title: 'Material App',
-          home: RegisterPage()),
+          home: LoginPage()),
     );
   }
 }

@@ -1,11 +1,13 @@
 import 'package:bp/colors.dart';
 import 'package:bp/size_config.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key key}) : super(key: key);
 
   @override
+  static String route = 'home';
   _HomePageState createState() => _HomePageState();
 }
 
@@ -16,7 +18,12 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         backgroundColor: kPrimeryColor,
-        onPressed: () {},
+        onPressed: () {
+          FirebaseAuth auth = FirebaseAuth.instance;
+
+          final User user = auth.currentUser;
+          print(user);
+        },
         child: Icon(
           Icons.add,
           size: getPSW(35),

@@ -11,13 +11,13 @@ class User with ChangeNotifier {
 
   User({this.id, this.name, this.cellPhone, this.email, this.passWord});
 
-  factory User.fromFirestore(DocumentSnapshot userDoc) {
-    Map userData = userDoc.data();
-    return User(
-        id: userDoc.id,
-        name: userData['name'],
-        cellPhone: userData['cellphone'],
-        email: userData['email'],
-        passWord: userData['password']);
-  }
+  // factory User.fromFirestore(DocumentSnapshot userDoc) {
+  //   Map userData = userDoc.data();
+  //   return User(
+  //       id: userDoc.id,
+  //       name: userData['name'],
+  //       cellPhone: userData['cellphone'],
+  //       email: userData['email'],
+  //       passWord: userData['password']);
+  // }
 }
