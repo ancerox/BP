@@ -1,5 +1,6 @@
 import 'package:bp/Components/CustomImput.dart';
 import 'package:bp/Components/customButton.dart';
+import 'package:bp/Components/loadingWidget.dart';
 import 'package:bp/Screens/HomePage/Home_page.dart';
 
 import 'package:bp/Screens/codeSms/CodeSms_S.dart';
@@ -23,20 +24,24 @@ class RegisterPage extends StatefulWidget {
   _RegisterPageState createState() => _RegisterPageState();
 }
 
+bool isLoading = false;
+
 class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     SizeConfig().init(context);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Registrate',
-          style: TextStyle(color: Colors.grey[700]),
-        ),
-      ),
-      body: body(),
-    );
+    return isLoading
+        ? LoadingWidget()
+        : Scaffold(
+            appBar: AppBar(
+              title: Text(
+                'Registrate',
+                style: TextStyle(color: Colors.grey[700]),
+              ),
+            ),
+            body: body(),
+          );
   }
 
   Widget body() {
@@ -101,6 +106,8 @@ class _InputsRegisterState extends State<InputsRegister> {
   TextEditingController repeatPassCtrl = TextEditingController();
   TextEditingController _emailController = TextEditingController();
   TextEditingController _nameCtrl = TextEditingController();
+
+  bool terms = false;
 
   @override
   Widget build(BuildContext context) {
@@ -225,8 +232,11 @@ class _InputsRegisterState extends State<InputsRegister> {
               text: 'Registrase',
               //
               context: context,
-              pressd: () async {
+              pressd: () {
                 if (_formKey.currentState.validate()) {
+                  setState(() {
+                    isLoading = true;
+                  });
                   register();
                 }
               }),
@@ -240,12 +250,10 @@ class _InputsRegisterState extends State<InputsRegister> {
     await provider.registerUser(
         _emailController.text, repeatPassCtrl.text, _nameCtrl.text);
 
+    setState(() {
+      isLoading = false;
+    });
     Navigator.popAndPushNamed(context, HomePage.route);
-    // return userCreds;
-
-    // print(userCreds);
-
-    // print(userCreds);
   }
 
   Row textsErros({String error}) {

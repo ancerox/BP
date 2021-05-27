@@ -19,7 +19,7 @@ class LoginPage extends StatefulWidget {
 }
 
 GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-TextEditingController _phoneCtroller = TextEditingController();
+TextEditingController _phoneCtroller = TextEditingController(text: '+1');
 
 bool errorText = false;
 
@@ -101,21 +101,19 @@ class _LoginPageState extends State<LoginPage> {
                 context: context,
                 pressd: () {
                   if (_formKey.currentState.validate()) {
-                    decider();
-                  } else {
-                    print('no se puede validar');
+                    verifier();
                   }
                 }),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text('Aun no tienes una cuenta?'),
+                Text(''),
                 TextButton(
                   onPressed: () async {
                     await FirebaseAuth.instance.signOut();
                   },
                   child: Text(
-                    'Registrate',
+                    'salir ',
                     style: TextStyle(
                         fontSize: getPSW(12),
                         fontWeight: FontWeight.bold,
@@ -130,10 +128,14 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  decider() async {
+  verifier() async {
     final provider = Provider.of<UserServices>(context, listen: false);
 
+//Show SnackBar if PhoneVerify is not valid
+    setState(() {
+      provider.verifyContext = context;
+    });
     //verify phoneNum
-    provider.verifyPhone(_phoneCtroller.text);
+    await provider.verifyPhone(_phoneCtroller.text);
   }
 }

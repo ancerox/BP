@@ -1,14 +1,26 @@
+import 'package:bp/Screens/HomePage/Home_page.dart';
+import 'package:bp/Screens/Register/Register_P.dart';
+import 'package:bp/Screens/codeSms/CodeSms_S.dart';
+import 'package:bp/colors.dart';
+import 'package:bp/size_config.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
 class UserServices with ChangeNotifier {
   bool smsScreen = false;
   String varId = '';
   String phoneNum = '';
+  bool isLoading = false;
+  bool isError = false;
+  BuildContext verifyContext;
+  BuildContext smsContext;
+
+  String smsCode = '';
+  final _fireStore = FirebaseFirestore.instance;
+  final auth = FirebaseAuth.instance;
+
   Future registerUser(String email, String password, String name) async {
     try {
       final creds =
@@ -20,14 +32,11 @@ class UserServices with ChangeNotifier {
 
       await user.linkWithCredential(creds);
 
-      // save name in FireBase
+      // save user collections
       await FirebaseFirestore.instance
           .collection('user')
           .doc(user.uid)
           .set({"name": name, "cellPhone": phoneNum});
-
-      // print(authCrends);
-      // return authCrends.credential;
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
         print('The password provided is too weak.');
@@ -41,21 +50,85 @@ class UserServices with ChangeNotifier {
   }
 
   Future verifyPhone(String phone) async {
-    await FirebaseAuth.instance.verifyPhoneNumber(
+    return await FirebaseAuth.instance.verifyPhoneNumber(
         phoneNumber: phone,
         verificationCompleted: (PhoneAuthCredential atuhCreds) {
           print(atuhCreds);
         },
         verificationFailed: (FirebaseAuthException exception) {
-          print(exception);
+          ScaffoldMessenger.of(verifyContext).showSnackBar(SnackBar(
+            duration: Duration(seconds: 3),
+            backgroundColor: kPrimeryColor,
+            content: Text(
+              'El numero no es valido!',
+              style:
+                  TextStyle(fontWeight: FontWeight.w600, fontSize: getPSH(16)),
+            ),
+          ));
         },
-        timeout: Duration(seconds: 60),
+        // timeout: Duration(seconds: 60),
         codeSent: (verifyId, rsToken) {
           smsScreen = true;
           notifyListeners();
           varId = verifyId;
           phoneNum = phone;
+          // return true;
         },
         codeAutoRetrievalTimeout: (auth) {});
+  }
+
+  Future verifyUser() async {
+    PhoneAuthCredential phoneAuthCredential =
+        PhoneAuthProvider.credential(verificationId: varId, smsCode: smsCode);
+    try {
+      //log the user in if exist
+      await auth.signInWithCredential(phoneAuthCredential);
+
+//is user un db?
+      return await _fireStore
+          .collection('user')
+          .where('cellPhone', isEqualTo: phoneNum)
+          .get()
+          .then((value) {
+        if (value.docs.length > 0) {
+          Navigator.pushNamedAndRemoveUntil(
+              smsContext, HomePage.route, (route) => false);
+          ScaffoldMessenger.of(smsContext).showSnackBar(SnackBar(
+            duration: Duration(seconds: 3),
+            backgroundColor: kPrimeryColor,
+            content: Text(
+              'Te has logeado correctamente',
+              style:
+                  TextStyle(fontWeight: FontWeight.w600, fontSize: getPSH(16)),
+            ),
+          ));
+        } else {
+          Navigator.pushNamedAndRemoveUntil(
+              smsContext, RegisterPage.routeName, (route) => false);
+        }
+      });
+    } on FirebaseAuthException catch (e) {
+      isLoading = false;
+      if (e.code == 'invalid-verification-code') {
+        ScaffoldMessenger.of(smsContext).showSnackBar(SnackBar(
+          duration: Duration(seconds: 3),
+          backgroundColor: kPrimeryColor,
+          content: Text(
+            'El codigo no es valido!',
+            style: TextStyle(fontWeight: FontWeight.w600, fontSize: getPSH(16)),
+          ),
+        ));
+        return null;
+      }
+
+      // if (e.code != null) {
+
+    }
+
+    // if (phoneAuthCredential == null) {
+    //
+
+    //   return null;
+    // }
   }
 }

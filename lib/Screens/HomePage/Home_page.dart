@@ -1,3 +1,4 @@
+import 'package:bp/Components/loadingWidget.dart';
 import 'package:bp/colors.dart';
 import 'package:bp/size_config.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -18,12 +19,7 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         backgroundColor: kPrimeryColor,
-        onPressed: () {
-          FirebaseAuth auth = FirebaseAuth.instance;
-
-          final User user = auth.currentUser;
-          print(user);
-        },
+        onPressed: () {},
         child: Icon(
           Icons.add,
           size: getPSW(35),

@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:bp/Components/customButton.dart';
+import 'package:bp/Components/loadingWidget.dart';
 import 'package:bp/Screens/HomePage/Home_page.dart';
 import 'package:bp/Screens/Register/Register_P.dart';
 import 'package:bp/colors.dart';
@@ -20,65 +23,108 @@ class SmsPage extends StatefulWidget {
 
 TextEditingController _smsControler = TextEditingController();
 
+bool isLoading = false;
+
 final BoxDecoration pinPutDecoration = BoxDecoration(
-  color: const Color.fromRGBO(43, 46, 66, 1),
+  color: kPrimeryColor,
   borderRadius: BorderRadius.circular(10.0),
   border: Border.all(
-    color: const Color.fromRGBO(126, 203, 224, 1),
+    color: kPrimeryColor,
   ),
 );
 
+bool isSent = true;
+int timerNum = 90;
+String displayNum = '';
+
 class _SmsPageState extends State<SmsPage> {
   @override
+  void initState() {
+    super.initState();
+    resendDendOtp();
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final provider = Provider.of<UserServices>(context, listen: false);
+
     return Scaffold(
-      body: CustomScrollView(
-        slivers: [
-          AppBarr(
-            context: context,
-            text: 'Verifica tu codigo',
-            text1: 'Asegurate de escribirlo correcto',
-          ),
-          SliverList(
-            delegate: SliverChildListDelegate([
-              // CustomButton(text: 'text', context: context, pressd: () {}),
-              inputCode(),
-              TextButton(
-                  onPressed: () async {
-                    verifyUser();
-                    // FirebaseAuth _auth = FirebaseAuth.instance;
-                    // final provider =
-                    //     Provider.of<UserServices>(context, listen: false);
-
-                    // PhoneAuthCredential phoneAuthCredential =
-                    //     PhoneAuthProvider.credential(
-                    //         verificationId: provider.varId,
-                    //         smsCode: _smsControler.text);
-
-                    // _auth.signInWithCredential(phoneAuthCredential);
-
-                    // Navigator.pushReplacementNamed(
-                    //     context, RegisterPage.routeName);
-                  },
-                  child: Container(
-                      height: 50,
-                      width: 400,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(20),
-                          color: kSecundary),
-                      child: Center(
-                          child: Text(
-                        'Verificar',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20,
-                            color: Colors.white),
-                      )))),
-            ]),
-          )
-        ],
-      ),
+      body: isLoading
+          ? LoadingWidget()
+          : CustomScrollView(
+              slivers: [
+                AppBarr(
+                  context: context,
+                  text: 'Verifica tu codigo',
+                  text1: 'Resiviras un codigo al ${provider.phoneNum}',
+                ),
+                SliverList(
+                  delegate: SliverChildListDelegate([
+                    // CustomButton(text: 'text', context: context, pressd: () {}),
+                    inputCode(),
+                    TextButton(
+                        onPressed: () {
+                          setState(() {
+                            isLoading = true;
+                          });
+                          verifyUser();
+                        },
+                        child: Container(
+                            height: 50,
+                            width: 400,
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(20),
+                                color: kSecundary),
+                            child: Center(
+                                child: Text(
+                              'Verificar',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20,
+                                  color: Colors.white),
+                            )))),
+                    TextButton(
+                        onPressed: isSent
+                            ? null
+                            : () {
+                                provider.verifyPhone(provider.phoneNum);
+                                setState(() {
+                                  isSent = true;
+                                  timerNum = 25;
+                                });
+                                resendDendOtp();
+                              },
+                        child: Text(
+                          isSent
+                              ? 'Podras reenviar tu codigo en $displayNum'
+                              : 'Reenviar Codigo',
+                          style: TextStyle(
+                              fontSize: getPSH(17), color: kPrimeryColor),
+                        ))
+                  ]),
+                )
+              ],
+            ),
     );
+  }
+
+  resendDendOtp() {
+    Timer.periodic(Duration(seconds: 1), (Timer t) {
+      setState(() {
+        timerNum = timerNum - 1;
+        displayNum = timerNum.toString();
+        if (timerNum <= 0) {
+          t.cancel();
+          isSent = false;
+        }
+      });
+    });
   }
 
   Widget inputCode() {
@@ -100,33 +146,14 @@ class _SmsPageState extends State<SmsPage> {
   }
 
   verifyUser() async {
-    final _fireStore = FirebaseFirestore.instance;
     final provider = Provider.of<UserServices>(context, listen: false);
 
-    final auth = FirebaseAuth.instance;
-    final User user = auth.currentUser;
+    provider.smsCode = _smsControler.text;
+    provider.smsContext = context;
 
-    PhoneAuthCredential phoneAuthCredential = PhoneAuthProvider.credential(
-        verificationId: provider.varId, smsCode: _smsControler.text);
-
-    await auth.signInWithCredential(phoneAuthCredential);
-
-    await _fireStore
-        .collection('user')
-        .where('cellPhone', isEqualTo: provider.phoneNum)
-        .get()
-        .then((value) {
-      if (value.docs.length > 0) {
-        Navigator.pushNamedAndRemoveUntil(
-            context, HomePage.route, (route) => false);
-      } else {
-        Navigator.pushNamedAndRemoveUntil(
-            context, RegisterPage.routeName, (route) => false);
-        // final auth = FirebaseAuth.instance;
-        // final User user = auth.currentUser;
-        // final uid = user.linkWithCredential(credential);
-        // print(uid);
-      }
+    await provider.verifyUser();
+    setState(() {
+      isLoading = provider.isLoading;
     });
   }
 }
@@ -153,8 +180,9 @@ class AppBarr extends StatelessWidget {
               style: TextStyle(
                   fontWeight: FontWeight.bold,
                   color: Color(0xff57575E),
-                  fontSize: 22)),
-          Text(text1, style: TextStyle(color: Colors.grey[600], fontSize: 15))
+                  fontSize: getPSH(20))),
+          Text(text1,
+              style: TextStyle(color: Colors.grey[600], fontSize: getPSH(15)))
         ]));
   }
 }
