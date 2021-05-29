@@ -31,7 +31,7 @@ Widget customImput({
         onChanged: onChanged,
         validator: validator,
         autofocus: false,
-        style: TextStyle(fontSize: 18),
+        style: TextStyle(fontSize: getPSH(18)),
         controller: textController,
         obscureText: isPassword,
         keyboardType: keyboardType,

@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 class UserServices with ChangeNotifier {
   bool smsScreen = false;
   String varId = '';
+  int token = 0;
   String phoneNum = '';
   bool isLoading = false;
   bool isError = false;
@@ -25,8 +26,6 @@ class UserServices with ChangeNotifier {
     try {
       final creds =
           EmailAuthProvider.credential(email: email, password: password);
-
-      FirebaseAuth auth = FirebaseAuth.instance;
 
       final User user = auth.currentUser;
 
@@ -72,6 +71,7 @@ class UserServices with ChangeNotifier {
           notifyListeners();
           varId = verifyId;
           phoneNum = phone;
+          token = rsToken;
           // return true;
         },
         codeAutoRetrievalTimeout: (auth) {});

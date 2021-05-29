@@ -1,8 +1,9 @@
-import 'package:bp/Components/loadingWidget.dart';
 import 'package:bp/colors.dart';
+import 'package:bp/services/user_services.dart';
 import 'package:bp/size_config.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key key}) : super(key: key);
@@ -15,11 +16,14 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
+    final token = Provider.of<UserServices>(context).token;
     SizeConfig().init(context);
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         backgroundColor: kPrimeryColor,
-        onPressed: () {},
+        onPressed: () {
+          print(token);
+        },
         child: Icon(
           Icons.add,
           size: getPSW(35),
@@ -131,8 +135,13 @@ class _HomePageState extends State<HomePage> {
       padding: EdgeInsets.symmetric(horizontal: 20),
       height: getPSH(80),
       width: getPSW(305),
-      decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(getPSH(20)), color: kLightBlueC),
+      decoration: BoxDecoration(boxShadow: [
+        BoxShadow(
+            spreadRadius: 0,
+            offset: Offset(0, 1),
+            blurRadius: 9.0,
+            color: Colors.grey[350])
+      ], borderRadius: BorderRadius.circular(getPSH(20)), color: kLightBlueC),
       child: Align(
           alignment: Alignment.centerLeft,
           child: RichText(
@@ -154,8 +163,13 @@ class _HomePageState extends State<HomePage> {
     return Container(
       height: getPSH(130),
       width: getPSW(305),
-      decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(getPSH(20)), color: kLightBlueC),
+      decoration: BoxDecoration(boxShadow: [
+        BoxShadow(
+            spreadRadius: 0,
+            offset: Offset(0, 1),
+            blurRadius: 9.0,
+            color: Colors.grey[350])
+      ], borderRadius: BorderRadius.circular(getPSH(20)), color: kLightBlueC),
       child: Align(
           child: RichText(
         textAlign: TextAlign.center,

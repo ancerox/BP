@@ -250,10 +250,15 @@ class _InputsRegisterState extends State<InputsRegister> {
     await provider.registerUser(
         _emailController.text, repeatPassCtrl.text, _nameCtrl.text);
 
-    setState(() {
-      isLoading = false;
-    });
     Navigator.popAndPushNamed(context, HomePage.route);
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      duration: Duration(seconds: 3),
+      backgroundColor: kPrimeryColor,
+      content: Text(
+        'Te has Registrado correctamente',
+        style: TextStyle(fontWeight: FontWeight.w600, fontSize: getPSH(16)),
+      ),
+    ));
   }
 
   Row textsErros({String error}) {

@@ -1,17 +1,12 @@
+import 'package:provider/provider.dart';
+import 'package:flutter/material.dart';
 import 'dart:async';
-
-import 'package:bp/Components/customButton.dart';
-import 'package:bp/Components/loadingWidget.dart';
-import 'package:bp/Screens/HomePage/Home_page.dart';
-import 'package:bp/Screens/Register/Register_P.dart';
-import 'package:bp/colors.dart';
+import 'package:pinput/pin_put/pin_put.dart';
 import 'package:bp/services/user_services.dart';
 import 'package:bp/size_config.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
-import 'package:pinput/pin_put/pin_put.dart';
-import 'package:provider/provider.dart';
+
+import 'package:bp/Components/loadingWidget.dart';
+import 'package:bp/colors.dart';
 
 class SmsPage extends StatefulWidget {
   SmsPage({Key key}) : super(key: key);
@@ -46,9 +41,11 @@ class _SmsPageState extends State<SmsPage> {
 
   @override
   void dispose() {
-    // TODO: implement dispose
+    timer.cancel();
     super.dispose();
   }
+
+  Timer timer;
 
   @override
   Widget build(BuildContext context) {
@@ -117,6 +114,7 @@ class _SmsPageState extends State<SmsPage> {
   resendDendOtp() {
     Timer.periodic(Duration(seconds: 1), (Timer t) {
       setState(() {
+        timer = t;
         timerNum = timerNum - 1;
         displayNum = timerNum.toString();
         if (timerNum <= 0) {
