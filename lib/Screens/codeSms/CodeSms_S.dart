@@ -8,12 +8,14 @@ import 'package:bp/size_config.dart';
 import 'package:bp/Components/loadingWidget.dart';
 import 'package:bp/colors.dart';
 
+import '../../user_preferences.dart';
+
 class SmsPage extends StatefulWidget {
   SmsPage({Key key}) : super(key: key);
 
-  static String route = 'sms';
   @override
   _SmsPageState createState() => _SmsPageState();
+  static String routeName = 'sms';
 }
 
 TextEditingController _smsControler = TextEditingController();
@@ -49,6 +51,8 @@ class _SmsPageState extends State<SmsPage> {
 
   @override
   Widget build(BuildContext context) {
+    SizeConfig().init(context);
+
     final provider = Provider.of<UserServices>(context, listen: false);
 
     return Scaffold(

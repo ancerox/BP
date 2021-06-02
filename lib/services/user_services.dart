@@ -1,7 +1,8 @@
 import 'package:bp/Screens/HomePage/Home_page.dart';
 import 'package:bp/Screens/Register/Register_P.dart';
-import 'package:bp/Screens/codeSms/CodeSms_S.dart';
+
 import 'package:bp/colors.dart';
+import 'package:bp/models/user_models.dart';
 import 'package:bp/size_config.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -13,6 +14,7 @@ class UserServices with ChangeNotifier {
   String varId = '';
   int token = 0;
   String phoneNum = '';
+  String userId = '';
   bool isLoading = false;
   bool isError = false;
   BuildContext verifyContext;
@@ -22,20 +24,21 @@ class UserServices with ChangeNotifier {
   final _fireStore = FirebaseFirestore.instance;
   final auth = FirebaseAuth.instance;
 
+  final CollectionReference userCollections =
+      FirebaseFirestore.instance.collection('user');
+
   Future registerUser(String email, String password, String name) async {
     try {
       final creds =
           EmailAuthProvider.credential(email: email, password: password);
 
-      final User user = auth.currentUser;
+      final user = auth.currentUser;
 
       await user.linkWithCredential(creds);
 
       // save user collections
-      await FirebaseFirestore.instance
-          .collection('user')
-          .doc(user.uid)
-          .set({"name": name, "cellPhone": phoneNum});
+
+      userCollections.doc(user.uid).set({"name": name, "cellPhone": phoneNum});
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
         print('The password provided is too weak.');
@@ -84,7 +87,9 @@ class UserServices with ChangeNotifier {
       //log the user in if exist
       await auth.signInWithCredential(phoneAuthCredential);
 
-//is user un db?
+      userId = auth.currentUser.uid;
+
+      //is user un db?
       return await _fireStore
           .collection('user')
           .where('cellPhone', isEqualTo: phoneNum)
@@ -120,15 +125,25 @@ class UserServices with ChangeNotifier {
         ));
         return null;
       }
-
-      // if (e.code != null) {
-
     }
+  }
 
-    // if (phoneAuthCredential == null) {
-    //
+  // UserData from snapshot
 
-    //   return null;
-    // }
+  UserData _userDataFromSnapchot(DocumentSnapshot snaphot) {
+    return UserData(
+      id: auth.currentUser.uid,
+      name: snaphot['name'],
+      cellPhone: snaphot['cellPhone'],
+    );
+  }
+
+  // get user creds
+
+  Stream<UserData> get userData {
+    return userCollections
+        .doc(auth.currentUser.uid)
+        .snapshots()
+        .map(_userDataFromSnapchot);
   }
 }

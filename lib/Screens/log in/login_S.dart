@@ -3,6 +3,7 @@ import 'package:bp/Components/customButton.dart';
 import 'package:bp/Screens/Register/Register_P.dart';
 import 'package:bp/Screens/codeSms/CodeSms_S.dart';
 import 'package:bp/services/user_services.dart';
+import 'package:bp/user_preferences.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -26,6 +27,7 @@ bool errorText = false;
 class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
+    UserPreferences().ultimaPagina = LoginPage.routeName;
     SizeConfig().init(context);
 
     final provider = Provider.of<UserServices>(context);
@@ -104,24 +106,6 @@ class _LoginPageState extends State<LoginPage> {
                     verifier();
                   }
                 }),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(''),
-                TextButton(
-                  onPressed: () async {
-                    await FirebaseAuth.instance.signOut();
-                  },
-                  child: Text(
-                    'salir ',
-                    style: TextStyle(
-                        fontSize: getPSW(12),
-                        fontWeight: FontWeight.bold,
-                        color: kPrimeryColor),
-                  ),
-                )
-              ],
-            ),
           ],
         ),
       )),
@@ -129,6 +113,9 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   verifier() async {
+    final prefs = UserPreferences();
+
+    prefs.userPhone = _phoneCtroller.text;
     final provider = Provider.of<UserServices>(context, listen: false);
 
 //Show SnackBar if PhoneVerify is not valid

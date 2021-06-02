@@ -7,13 +7,14 @@ import 'package:bp/Screens/codeSms/CodeSms_S.dart';
 import 'package:bp/Screens/log%20in/login_S.dart';
 
 import 'package:bp/services/user_services.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+
 import 'package:flutter/material.dart';
 import 'package:bp/colors.dart';
 import 'package:bp/size_config.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
+import '../../user_preferences.dart';
 import 'errosStrings.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -29,6 +30,7 @@ bool isLoading = false;
 class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
+    UserPreferences().ultimaPagina = RegisterPage.routeName;
     SizeConfig().init(context);
 
     return isLoading
@@ -137,7 +139,7 @@ class _InputsRegisterState extends State<InputsRegister> {
               hintText: 'Nombre',
               icon: Icons.person,
               isPassword: false,
-              keyboardType: TextInputType.name),
+              keyboardType: TextInputType.text),
           customImput(
               // focusNode: focusnode.hasFocus,
               // textController: _emailEditingController,
