@@ -3,6 +3,7 @@ import 'package:bp/Components/loadingWidget.dart';
 import 'package:bp/Screens/HomePage/center_card.dart';
 import 'package:bp/Screens/center/center_page.dart';
 import 'package:bp/colors.dart';
+import 'package:bp/models/beauty_centers.dart';
 
 import 'package:bp/models/user_models.dart';
 import 'package:bp/services/centers_services.dart';
@@ -186,12 +187,13 @@ class _HomePageState extends State<HomePage> {
     return StreamBuilder(
       stream: provider.centerIds,
       builder: (context, snap) {
+        print(snap.data);
         if (snap.data != null) {
           if (snap.data.length > 0) {
             return Column(
               children: List.generate(
                   snap.data.length,
-                  (index) => StreamBuilder(
+                  (index) => StreamBuilder<CentersData>(
                         stream: provider.centerData(snap.data[index]),
                         builder: (context, snap) {
                           if (snap.data != null) {

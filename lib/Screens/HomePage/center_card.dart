@@ -1,3 +1,4 @@
+import 'package:bp/models/beauty_centers.dart';
 import 'package:flutter/material.dart';
 
 import '../../size_config.dart';
@@ -8,7 +9,7 @@ class CenterCard extends StatelessWidget {
     @required this.data,
   }) : super(key: key);
 
-  final data;
+  final CentersData data;
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +36,7 @@ class CenterCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(25),
                 child: Image(
                   fit: BoxFit.cover,
-                  image: NetworkImage(data['fotoUrl']),
+                  image: NetworkImage(data.fotoUrl),
                 ),
               ),
               width: getPSW(100),
@@ -55,7 +56,7 @@ class CenterCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      data['name'],
+                      data.name,
                       style: TextStyle(
                           height: getPSH(1.5),
                           fontSize: getPSW(18),

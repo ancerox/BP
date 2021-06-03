@@ -13,15 +13,6 @@ class CenterProivder with ChangeNotifier {
 
   final centers = FirebaseFirestore.instance.collection('centers');
 
-  List<CentersData> _centersDataFromSnapshot(QuerySnapshot snapshot) {
-    return snapshot.docs.map((snapshot) {
-      return CentersData(
-          fotoUrl: snapshot.get('fotoUrl'),
-          centerId: snapshot.get('centerId'),
-          name: snapshot.get('name'));
-    }).toList();
-  }
-
   final userid = FirebaseAuth.instance.currentUser.uid;
 
   get centerIds {
@@ -31,15 +22,18 @@ class CenterProivder with ChangeNotifier {
         .map((event) => event['centers']);
   }
 
-  // centerData(String centerIds) {
-  //   return centers.doc(centerIds).snapshots().map((event) {
-  //     return CentersData();
-  //   });
-  // }
-
-  centerData(String centerIds) {
-    return centers.doc(centerIds).snapshots().map((event) => event.data());
+  Stream<CentersData> centerData(String centerIds) {
+    return centers.doc(centerIds).snapshots().map((event) {
+      return CentersData(
+          fotoUrl: event.get('fotoUrl'),
+          centerId: event.get('centerId'),
+          name: event.get('name'));
+    });
   }
+
+  // centerData(String centerIds) {
+  //   return centers.doc(centerIds).snapshots().map((event) => event.data());
+  // }
 
   addCenter(String centerId) async {
     await centers.where('centerId', isEqualTo: centerId).get().then((center) {
