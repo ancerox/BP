@@ -1,15 +1,18 @@
+import 'package:bp/Components/customButton.dart';
 import 'package:bp/Components/loadingWidget.dart';
+import 'package:bp/Screens/HomePage/center_card.dart';
+import 'package:bp/Screens/center/center_page.dart';
 import 'package:bp/colors.dart';
-import 'package:bp/models/beauty_centers.dart';
+
 import 'package:bp/models/user_models.dart';
 import 'package:bp/services/centers_services.dart';
 import 'package:bp/services/user_services.dart';
 import 'package:bp/size_config.dart';
-import 'package:bp/models/beauty_centers.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
+import 'no_centters_added.dart';
 
 TextEditingController centerCodeCtr = TextEditingController();
 
@@ -27,11 +30,8 @@ class _HomePageState extends State<HomePage> {
       floatingActionButton: FloatingActionButton(
         backgroundColor: kPrimeryColor,
         onPressed: () async {
-          // final provider = Provider.of<CenterProivder>(context, listen: false);
-
-          // provider.centersList
-
-          await FirebaseAuth.instance.signOut();
+          addCenter();
+          // await FirebaseAuth.instance.signOut();
         },
         child: Icon(
           Icons.add,
@@ -187,16 +187,28 @@ class _HomePageState extends State<HomePage> {
       stream: provider.centerIds,
       builder: (context, snap) {
         if (snap.data != null) {
-          return Column(
-            children: List.generate(
-                snap.data.length,
-                (index) => StreamBuilder(
-                      stream: provider.centerData(snap.data[index]),
-                      builder: (context, snap) {
-                        return centerCard(snap.data);
-                      },
-                    )),
-          );
+          if (snap.data.length > 0) {
+            return Column(
+              children: List.generate(
+                  snap.data.length,
+                  (index) => StreamBuilder(
+                        stream: provider.centerData(snap.data[index]),
+                        builder: (context, snap) {
+                          if (snap.data != null) {
+                            return InkWell(
+                                onTap: () {
+                                  Navigator.pushNamed(
+                                      context, CenterPage.route);
+                                },
+                                child: CenterCard(data: snap.data));
+                          } else {
+                            return Container();
+                          }
+                        },
+                      )),
+            );
+          }
+          return NoCenttersAdded();
         }
 
         return Container();
@@ -204,160 +216,68 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget centerCard(data) {
-    return Center(
-      child: Container(
-        margin: EdgeInsets.symmetric(vertical: getPSH(10)),
-        height: getPSH(120),
-        width: getPSW(328),
-        decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(getPSH(17)),
-            color: Colors.white,
-            boxShadow: [
-              BoxShadow(
-                  spreadRadius: 0,
-                  offset: Offset(0, 1),
-                  blurRadius: 9.0,
-                  color: Colors.grey[350])
-            ]),
-        child: Row(
-          // mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Container(
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(25),
-                child: Image(
-                  fit: BoxFit.cover,
-                  image: NetworkImage(data['fotoUrl']),
-                ),
-              ),
-              width: getPSW(100),
-              height: double.infinity,
-              decoration: BoxDecoration(
-                border: Border.all(
-                  width: 10,
-                  color: Colors.white,
-                ),
-                borderRadius: BorderRadius.circular(20),
-              ),
-            ),
-            Container(
-              padding: EdgeInsets.only(
-                  left: getPSW(15), bottom: getPSH(15), top: getPSH(15)),
-              child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      data['name'],
-                      style: TextStyle(
-                          height: getPSH(1.5),
-                          fontSize: getPSW(18),
-                          fontWeight: FontWeight.w400),
-                    ),
-                    Text(
-                      'Desde 8:00 Am',
-                      style: TextStyle(
-                          height: getPSH(1.5),
-                          fontSize: getPSW(10),
-                          fontWeight: FontWeight.w200),
-                    ),
-                    Text(
-                      'Hasta 5:00 Pm',
-                      style: TextStyle(
-                          fontSize: getPSW(10), fontWeight: FontWeight.w200),
-                    ),
-                    SizedBox(
-                      height: getPSH(5),
-                    ),
-                    Row(
-                      children: [
-                        ...List.generate(
-                            3,
-                            (index) => CircleAvatar(
-                                  maxRadius: getPSH(12),
-                                ))
-                      ],
-                    )
-                  ]),
-            ),
-            Align(
-              alignment: Alignment.bottomRight,
-              child: Container(
-                margin: EdgeInsets.only(left: getPSH(40), bottom: getPSH(20)),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(
-                      'Abierto',
-                      style: TextStyle(
-                          fontSize: getPSH(12), fontWeight: FontWeight.w300),
-                    ),
-                    SizedBox(
-                      width: getPSW(5),
-                    ),
-                    Icon(
-                      Icons.circle,
-                      color: Color(0xff74EFAD),
-                      size: getPSH(14),
-                    )
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   addCenter() {
-    // final provider = Provider.of<UserServices>(context, listen: false);
-
-    // provider.centersList();
-
-    // showDialog(
-    //     context: context,
-    //     builder: (context) {
-    //       return AlertDialog(
-    //         actions: [
-    //           IconButton(
-    //               icon: Text('Buscar'),
-    //               onPressed: () {
-    //                 provider.addCenter(centerCodeCtr.text);
-    //                 print(centerCodeCtr.text);
-    //               })
-    //         ],
-    //         content: TextFormField(
-    //           controller: centerCodeCtr,
-    //         ),
-    //       );
-    //     });
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(20.0))),
+              content: Container(
+                decoration: BoxDecoration(),
+                width: getPSW(100),
+                height: getPSH(150),
+                child: Stack(children: [
+                  Column(
+                    children: [
+                      Align(
+                        // These values are based on trial & error method
+                        alignment: Alignment(1.07, -1.08),
+                        child: InkWell(
+                          onTap: () {
+                            Navigator.pop(context);
+                          },
+                          child: Container(
+                            height: getPSH(40),
+                            width: getPSW(40),
+                            decoration: BoxDecoration(
+                              color: kPrimeryColor,
+                              borderRadius: BorderRadius.circular(getPSH(20)),
+                            ),
+                            child: Icon(
+                              Icons.close,
+                              size: getPSH(30),
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                          child: Text(
+                        'Agrega tu centro de belleza',
+                        style: TextStyle(fontWeight: FontWeight.w600),
+                      )),
+                      Expanded(
+                          child: TextField(
+                        style: TextStyle(fontSize: getPSH(20)),
+                        controller: centerCodeCtr,
+                      )),
+                      Expanded(
+                        child: CustomButton(
+                          context: context,
+                          text: 'agregar',
+                          pressd: () {
+                            final provider = Provider.of<CenterProivder>(
+                                context,
+                                listen: false);
+                            provider.addCenter(centerCodeCtr.text);
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ]),
+              ));
+        });
   }
 }
-
-//  return Container(
-//           height: getPSH(130),
-//           width: getPSW(305),
-//           decoration: BoxDecoration(boxShadow: [
-//             BoxShadow(
-//                 spreadRadius: 0,
-//                 offset: Offset(0, 1),
-//                 blurRadius: 9.0,
-//                 color: Colors.grey[350])
-//           ], borderRadius: BorderRadius.circular(getPSH(20)), color: kLightBlueC),
-//           child: Align(
-//               child: RichText(
-//             textAlign: TextAlign.center,
-//             text: TextSpan(children: [
-//               TextSpan(
-//                 text:
-//                     'Aun no tienes centros de belleza registrados puedes agregar tocando el ',
-//                 style: TextStyle(color: kLightColor, fontSize: getPSH(18)),
-//               ),
-//               TextSpan(
-//                 text: 'boton de agregar abajo',
-//                 style: TextStyle(color: Colors.black, fontSize: getPSH(18)),
-//               ),
-//             ]),
-//           )),
-//         );

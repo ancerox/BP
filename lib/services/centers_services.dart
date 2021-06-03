@@ -31,6 +31,12 @@ class CenterProivder with ChangeNotifier {
         .map((event) => event['centers']);
   }
 
+  // centerData(String centerIds) {
+  //   return centers.doc(centerIds).snapshots().map((event) {
+  //     return CentersData();
+  //   });
+  // }
+
   centerData(String centerIds) {
     return centers.doc(centerIds).snapshots().map((event) => event.data());
   }
@@ -38,23 +44,18 @@ class CenterProivder with ChangeNotifier {
   addCenter(String centerId) async {
     await centers.where('centerId', isEqualTo: centerId).get().then((center) {
       if (center.docs.length > 0) {
-        // loadcenter(centerId);
+        loadcenter(centerId);
+        return true;
       } else {
         print('El centor no existe');
+        return false;
       }
     });
   }
 
-  // void loadcenter(centerId) async {
-  //   await userCollections.doc(uid).update({
-  //     'centers': [centerId],
-  //   });
-  // }
-
-  centersList() async {
-    return await userCollections
-        .doc(uid)
-        .get()
-        .then((value) => value['centers']);
+  void loadcenter(centerId) async {
+    await userCollections.doc(uid).update({
+      'centers': FieldValue.arrayUnion([centerId])
+    });
   }
 }

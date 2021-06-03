@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 
 class CenterPage extends StatefulWidget {
   CenterPage({Key key}) : super(key: key);
-
+  static String route = 'centerPage';
   @override
   _CenterPageState createState() => _CenterPageState();
 }

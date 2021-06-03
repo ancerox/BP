@@ -1,4 +1,5 @@
 import 'package:bp/Screens/HomePage/Home_page.dart';
+import 'package:bp/Screens/center/center_page.dart';
 import 'package:bp/Screens/codeSms/CodeSms_S.dart';
 import 'package:bp/Screens/log%20in/login_S.dart';
 import 'package:bp/authWrapped.dart';
@@ -12,4 +13,5 @@ Map<String, WidgetBuilder> routes = {
   SmsPage.routeName: (_) => SmsPage(),
   HomePage.route: (_) => HomePage(),
   AuthWraped.route: (_) => AuthWraped(),
+  CenterPage.route: (_) => CenterPage(),
 };
