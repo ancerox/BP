@@ -6,31 +6,36 @@ import '../size_config.dart';
 class CustomBackButton extends StatelessWidget {
   const CustomBackButton({
     Key key,
+    this.pressd,
   }) : super(key: key);
+
+  final pressd;
 
   @override
   Widget build(BuildContext context) {
     SizeConfig().init(context);
     return Container(
-      margin: EdgeInsets.only(left: 20),
+      margin: EdgeInsets.only(left: getPSW(10)),
       height: getPSH(50),
       width: getPSW(50),
-      decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20), color: Colors.white38),
+      decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.white38),
       child: Center(
         child: Container(
           decoration: BoxDecoration(
-              color: Colors.white, borderRadius: BorderRadius.circular(20)),
-          width: getPSW(44),
-          height: getPSH(44),
-          child: IconButton(
-            icon: Icon(
-              Icons.arrow_back_ios_rounded,
-              size: 30,
-              color: kPrimeryColor,
-            ),
-            onPressed: () {},
+            shape: BoxShape.circle,
+            color: Colors.white,
           ),
+          width: getPSW(45),
+          height: getPSH(38),
+          child: IconButton(
+              icon: Icon(
+                Icons.arrow_back_ios_rounded,
+                size: getPSH(25),
+                color: kPrimeryColor,
+              ),
+              onPressed: () {
+                pressd();
+              }),
         ),
       ),
     );

@@ -19,31 +19,33 @@ class CenterCard extends StatelessWidget {
         height: getPSH(120),
         width: getPSW(328),
         decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(getPSH(17)),
-            color: Colors.white,
-            boxShadow: [
-              BoxShadow(
-                  spreadRadius: 0,
-                  offset: Offset(0, 1),
-                  blurRadius: 9.0,
-                  color: Colors.grey[350])
-            ]),
+          borderRadius: BorderRadius.circular(getPSH(17)),
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+                spreadRadius: 0,
+                offset: Offset(0, 1),
+                blurRadius: 9.0,
+                color: Colors.grey[350])
+          ],
+        ),
         child: Row(
           // mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Container(
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(25),
-                child: Image(
+                borderRadius: BorderRadius.circular(getPSH(25)),
+                child: FadeInImage(
                   fit: BoxFit.cover,
                   image: NetworkImage(data.fotoUrl),
+                  placeholder: AssetImage('assets/loadingGif/LoadingLoop.gif'),
                 ),
               ),
-              width: getPSW(100),
+              width: getPSW(90),
               height: double.infinity,
               decoration: BoxDecoration(
                 border: Border.all(
-                  width: 10,
+                  width: getPSW(10),
                   color: Colors.white,
                 ),
                 borderRadius: BorderRadius.circular(20),
@@ -88,6 +90,7 @@ class CenterCard extends StatelessWidget {
                     )
                   ]),
             ),
+            Spacer(),
             Align(
               alignment: Alignment.bottomRight,
               child: Container(
@@ -107,7 +110,8 @@ class CenterCard extends StatelessWidget {
                       Icons.circle,
                       color: Color(0xff74EFAD),
                       size: getPSH(14),
-                    )
+                    ),
+                    SizedBox(width: getPSW(20))
                   ],
                 ),
               ),

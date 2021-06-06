@@ -15,8 +15,12 @@ Widget customImput({
 }) {
   return Stack(children: [
     Container(
-      margin: EdgeInsets.only(bottom: 20),
-      padding: EdgeInsets.only(right: 20, top: 5, bottom: 5, left: 5),
+      margin: EdgeInsets.only(bottom: getPSH(20)),
+      padding: EdgeInsets.only(
+          right: getPSW(20),
+          top: getPSH(5),
+          bottom: getPSH(5),
+          left: getPSH(5)),
       decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(getPSW(30)),
@@ -31,7 +35,7 @@ Widget customImput({
         onChanged: onChanged,
         validator: validator,
         autofocus: false,
-        style: TextStyle(fontSize: getPSH(18)),
+        style: TextStyle(fontSize: getPSH(17)),
         controller: textController,
         obscureText: isPassword,
         keyboardType: keyboardType,
@@ -40,15 +44,19 @@ Widget customImput({
           errorText: '',
           errorMaxLines: 1,
           errorStyle: TextStyle(
-            height: 0,
+            height: getPSH(0),
             color: Colors.transparent,
-            fontSize: 0,
+            fontSize: getPSH(0),
           ),
           floatingLabelBehavior: FloatingLabelBehavior.always,
-          contentPadding: EdgeInsets.symmetric(horizontal: 35, vertical: 10),
-          hintStyle: TextStyle(fontSize: getPSW(15)),
+          contentPadding: EdgeInsets.symmetric(
+              horizontal: getPSW(35), vertical: getPSH(10)),
+          hintStyle: TextStyle(fontSize: getPSW(17)),
           hintText: hintText,
-          suffixIcon: Icon(icon),
+          suffixIcon: Icon(
+            icon,
+            size: getPSH(25),
+          ),
           border: InputBorder.none,
           focusedBorder: InputBorder.none,
           enabledBorder: InputBorder.none,

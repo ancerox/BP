@@ -8,6 +8,8 @@ import 'package:flutter_svg/svg.dart';
 class SplashScreen extends StatefulWidget {
   SplashScreen({Key key}) : super(key: key);
 
+  static String route = 'splash';
+
   @override
   _SplashScreenState createState() => _SplashScreenState();
 }
@@ -73,7 +75,8 @@ class _SplashScreenState extends State<SplashScreen> {
                 pressd: () {
                   Navigator.pushReplacementNamed(context, LoginPage.routeName);
                 },
-                context: context)
+                context: context),
+            SizedBox(height: getPSH(15))
           ],
         ),
       ),
@@ -118,7 +121,10 @@ class SplashContent extends StatelessWidget {
         ),
         Text(
           text,
-          style: TextStyle(color: kPrimeryColor),
+          style: TextStyle(
+              color: kPrimeryColor,
+              fontSize: getPSW(13),
+              fontWeight: FontWeight.w400),
         ),
         SvgPicture.asset(
           image,

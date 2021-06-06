@@ -1,4 +1,10 @@
-import 'package:bp/Components/customButton.dart';
+import 'package:bp/Screens/HomePage/drawer.dart';
+import 'package:bp/services/user_services.dart';
+import 'package:bp/size_config.dart';
+import 'package:bp/services/centers_services.dart';
+import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
+
 import 'package:bp/Components/loadingWidget.dart';
 import 'package:bp/Screens/HomePage/center_card.dart';
 import 'package:bp/Screens/center/center_page.dart';
@@ -6,16 +12,12 @@ import 'package:bp/colors.dart';
 import 'package:bp/models/beauty_centers.dart';
 
 import 'package:bp/models/user_models.dart';
-import 'package:bp/services/centers_services.dart';
-import 'package:bp/services/user_services.dart';
-import 'package:bp/size_config.dart';
-
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-
 import 'no_centters_added.dart';
 
 TextEditingController centerCodeCtr = TextEditingController();
+
+final GlobalKey<ScaffoldState> _scafoldKey = GlobalKey<ScaffoldState>();
 
 class HomePage extends StatefulWidget {
   static String route = 'home';
@@ -28,11 +30,12 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     SizeConfig().init(context);
     return Scaffold(
+      drawer: MainDrawer(),
+      key: _scafoldKey,
       floatingActionButton: FloatingActionButton(
         backgroundColor: kPrimeryColor,
-        onPressed: () async {
+        onPressed: () {
           addCenter();
-          // await FirebaseAuth.instance.signOut();
         },
         child: Icon(
           Icons.add,
@@ -81,7 +84,9 @@ class _HomePageState extends State<HomePage> {
         children: [
           IconButton(
             iconSize: getPSH(25),
-            onPressed: () {},
+            onPressed: () {
+              _scafoldKey.currentState.openDrawer();
+            },
             icon: Image(
               image: AssetImage('assets/icons/menu.png'),
             ),
@@ -99,7 +104,7 @@ class _HomePageState extends State<HomePage> {
                       fontStyle: FontStyle.normal,
                       fontWeight: FontWeight.w500,
                       height: 1.5,
-                      fontSize: getPSH(22)),
+                      fontSize: getPSH(27)),
                 ),
                 TextSpan(
                   text: snapshot.data.name,
@@ -108,7 +113,7 @@ class _HomePageState extends State<HomePage> {
                       fontStyle: FontStyle.normal,
                       fontWeight: FontWeight.w500,
                       height: 1.2,
-                      fontSize: getPSH(20)),
+                      fontSize: getPSH(25)),
                 )
               ],
               //
@@ -159,10 +164,11 @@ class _HomePageState extends State<HomePage> {
       width: getPSW(305),
       decoration: BoxDecoration(boxShadow: [
         BoxShadow(
-            spreadRadius: 0,
-            offset: Offset(0, 1),
-            blurRadius: 9.0,
-            color: Colors.grey[350])
+          spreadRadius: 0,
+          offset: Offset(0, 1),
+          blurRadius: 9.0,
+          color: Colors.grey[350],
+        )
       ], borderRadius: BorderRadius.circular(getPSH(20)), color: kLightBlueC),
       child: Align(
           alignment: Alignment.centerLeft,
@@ -199,8 +205,8 @@ class _HomePageState extends State<HomePage> {
                           if (snap.data != null) {
                             return InkWell(
                                 onTap: () {
-                                  Navigator.pushNamed(
-                                      context, CenterPage.route);
+                                  Navigator.pushNamed(context, CenterPage.route,
+                                      arguments: snap.data);
                                 },
                                 child: CenterCard(data: snap.data));
                           } else {
@@ -230,34 +236,35 @@ class _HomePageState extends State<HomePage> {
                 width: getPSW(100),
                 height: getPSH(150),
                 child: Stack(children: [
-                  Column(
-                    children: [
-                      Align(
-                        // These values are based on trial & error method
-                        alignment: Alignment(1.07, -1.08),
-                        child: InkWell(
-                          onTap: () {
-                            Navigator.pop(context);
-                          },
-                          child: Container(
-                            height: getPSH(40),
-                            width: getPSW(40),
-                            decoration: BoxDecoration(
-                              color: kPrimeryColor,
-                              borderRadius: BorderRadius.circular(getPSH(20)),
-                            ),
-                            child: Icon(
-                              Icons.close,
-                              size: getPSH(30),
-                              color: Colors.white,
-                            ),
-                          ),
+                  Align(
+                    // These values are based on trial & error method
+                    alignment: Alignment(1.475, -1.6),
+                    child: InkWell(
+                      onTap: () {
+                        Navigator.pop(context);
+                      },
+                      child: Container(
+                        height: getPSH(40),
+                        width: getPSW(40),
+                        decoration: BoxDecoration(
+                          color: kPrimeryColor,
+                          borderRadius: BorderRadius.circular(getPSH(20)),
+                        ),
+                        child: Icon(
+                          Icons.close,
+                          size: getPSH(30),
+                          color: Colors.white,
                         ),
                       ),
+                    ),
+                  ),
+                  Column(
+                    children: [
                       Expanded(
                           child: Text(
                         'Agrega tu centro de belleza',
-                        style: TextStyle(fontWeight: FontWeight.w600),
+                        style: TextStyle(
+                            fontWeight: FontWeight.w600, fontSize: getPSH(14)),
                       )),
                       Expanded(
                           child: TextField(
@@ -265,17 +272,26 @@ class _HomePageState extends State<HomePage> {
                         controller: centerCodeCtr,
                       )),
                       Expanded(
-                        child: CustomButton(
-                          context: context,
-                          text: 'agregar',
-                          pressd: () {
+                          child: Container(
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(getPSH(15)),
+                            color: kSecundary),
+                        width: double.infinity,
+                        child: TextButton(
+                          onPressed: () {
                             final provider = Provider.of<CenterProivder>(
                                 context,
                                 listen: false);
+
                             provider.addCenter(centerCodeCtr.text);
                           },
+                          child: Text('Agregar',
+                              style: TextStyle(
+                                  fontSize: getPSH(15),
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w600)),
                         ),
-                      ),
+                      )),
                     ],
                   ),
                 ]),

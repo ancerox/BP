@@ -9,11 +9,21 @@ import 'package:flutter/rendering.dart';
 class DateTimePage extends StatefulWidget {
   DateTimePage({Key key}) : super(key: key);
 
+  static String route = 'dataTime';
+
   @override
   _DateTimePageState createState() => _DateTimePageState();
 }
 
-List<String> listOfDays = ["lun", "mar", "mie", "jue", "vie", "sab", "dom"];
+List<String> listOfDays = [
+  "lun",
+  "mar",
+  "mie",
+  "jue",
+  "vie",
+  "sab",
+  "dom",
+];
 
 class _DateTimePageState extends State<DateTimePage>
     with SingleTickerProviderStateMixin {

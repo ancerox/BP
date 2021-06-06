@@ -1,7 +1,16 @@
 import 'package:bp/Components/BackButton.dart';
+import 'package:bp/Components/loadingWidget.dart';
 import 'package:bp/colors.dart';
+import 'package:bp/models/beauty_centers.dart';
+import 'package:bp/models/stylists.dart';
+import 'package:bp/services/centers_services.dart';
+
 import 'package:bp/size_config.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
+
+import 'image_center.dart';
 
 class CenterPage extends StatefulWidget {
   CenterPage({Key key}) : super(key: key);
@@ -13,6 +22,7 @@ class CenterPage extends StatefulWidget {
 class _CenterPageState extends State<CenterPage> {
   @override
   Widget build(BuildContext context) {
+    final CentersData centersData = ModalRoute.of(context).settings.arguments;
     SizeConfig().init(context);
 
     return Scaffold(
@@ -22,8 +32,8 @@ class _CenterPageState extends State<CenterPage> {
         child: Container(
             decoration: BoxDecoration(
                 color: kSecundary, borderRadius: BorderRadius.circular(20)),
-            width: 285.0,
-            height: 60.0,
+            width: getPSW(270),
+            height: getPSH(55),
             child: new RawMaterialButton(
               child: Text(
                 'Solicitar Servicio',
@@ -40,76 +50,160 @@ class _CenterPageState extends State<CenterPage> {
       ),
       body: CustomScrollView(
         slivers: [
-          imageCenter(),
+          imageCenter(centersData, context),
           SliverList(
-              delegate: SliverChildListDelegate([
-            Container(
-                margin: EdgeInsets.all(40),
-                color: Colors.red,
-                child: Container(
-                  height: 80,
-                  color: Colors.red,
+            delegate: SliverChildListDelegate(
+              [
+                Container(
+                  margin: EdgeInsets.all(getPSH(20)),
                   child: Column(
-                    children: [Text('te1')],
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        height: getPSH(50),
+                        width: getPSW(100),
+                        decoration: BoxDecoration(
+                            color: kLightBlueC,
+                            borderRadius: BorderRadius.circular(getPSW(10))),
+                        child: Center(
+                          child: Text(
+                            'Estilistas',
+                            style: TextStyle(
+                                color: kLightColor,
+                                fontWeight: FontWeight.w600,
+                                fontSize: getPSH(18)),
+                          ),
+                        ),
+                      ),
+                      buildStylistsList(centersData),
+                    ],
                   ),
-                ))
-          ])),
+                )
+              ],
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget imageCenter() {
-    return SliverAppBar(
-      // this is where I would like to set some minimum constraint
-      expandedHeight: 300,
-      floating: false,
-      pinned: true,
-      bottom: PreferredSize(
-        // Add this code
-        preferredSize: Size.fromHeight(60.0), // Add this code
-        child: Text(''), // Add this code
-      ), // Add this code
-      flexibleSpace: Container(
-        padding: EdgeInsets.all(10),
-        height: 340,
-        width: double.infinity,
-        child: Container(
-          child: Column(
-            // mainAxisAlignment: MainAxisAlignment.end,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              SizedBox(
-                height: getPSH(30),
-              ),
-              CustomBackButton(),
-              Spacer(
-                flex: 4,
-              ),
-              Expanded(
-                  child: Container(
-                margin: EdgeInsets.only(left: getPSW(20)),
-                child: Text(
-                  'Barbia don Juan',
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: getPSW(24),
-                      fontWeight: FontWeight.w700),
-                ),
-              )),
-            ],
-          ),
-        ),
-        decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(getPSH(10)),
-            color: Colors.black.withOpacity(1),
-            image: DecorationImage(
-                image: NetworkImage(
-                    'https://www.outletmandara.com/blog/wp-content/uploads/2014/06/ARSpa264113258barspa264g.jpg'),
-                colorFilter: ColorFilter.mode(
-                    Colors.grey.withOpacity(0.9), BlendMode.dstATop),
-                fit: BoxFit.cover)),
+  Column buildStylistsList(CentersData centersData) {
+    final stylists = Provider.of<CenterProivder>(context, listen: false);
+
+    return Column(
+      children: List.generate(
+        centersData.stylists.length,
+        (index) => StreamBuilder<StylistData>(
+            stream: stylists.stylitys(centersData.stylists[index]),
+            builder: (context, snap) {
+              if (snap.data != null) {
+                return StylistsCard(
+                  data: snap.data,
+                );
+              } else {
+                return LoadingWidget();
+              }
+            }),
       ),
     );
   }
 }
+
+class StylistsCard extends StatelessWidget {
+  const StylistsCard({
+    Key key,
+    @required this.data,
+  }) : super(key: key);
+
+  final StylistData data;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: EdgeInsets.symmetric(vertical: getPSH(10)),
+      height: getPSH(90),
+      width: double.infinity,
+      decoration: BoxDecoration(boxShadow: [
+        BoxShadow(
+            spreadRadius: 0,
+            offset: Offset(0, 1),
+            blurRadius: 9.0,
+            color: Colors.grey[350])
+      ], borderRadius: BorderRadius.circular(getPSW(20)), color: Colors.white),
+      child: Row(
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(getPSH(20)),
+              border: Border.all(
+                color: Colors.white,
+                width: getPSW(10),
+              ),
+            ),
+            height: double.infinity,
+            width: getPSW(70),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(getPSH(15)),
+              child: FadeInImage(
+                fit: BoxFit.cover,
+                placeholder: AssetImage('assets/loadingGif/LoadingLoop.gif'),
+                image: NetworkImage(data.photoUrl),
+              ),
+            ),
+          ),
+          Container(
+            margin: EdgeInsets.all(getPSH(10)),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  child: Text(
+                    data.name,
+                    style: TextStyle(
+                        fontSize: getPSH(18), fontWeight: FontWeight.w500),
+                  ),
+                ),
+                SizedBox(height: getPSH(7)),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Disponible',
+                      style: TextStyle(fontSize: getPSW(13)),
+                    ),
+                    SizedBox(width: getPSW(5)),
+                    Icon(
+                      Icons.circle,
+                      size: getPSH(12),
+                      color: Color(0xff74EFAD),
+                    )
+                  ],
+                )
+              ],
+            ),
+          ),
+          Spacer(),
+          Container(
+            height: 40,
+            width: 40,
+            decoration: BoxDecoration(
+              color: kPrimeryColor,
+              borderRadius: BorderRadius.circular(
+                25,
+              ),
+            ),
+            child: Icon(
+              Icons.chat_rounded,
+              color: Colors.white,
+              size: 20,
+            ),
+          ),
+          SizedBox(width: getPSW(20))
+        ],
+      ),
+    );
+  }
+}
+//

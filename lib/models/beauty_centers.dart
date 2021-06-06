@@ -2,7 +2,7 @@ class CentersData {
   String centerId;
   String fotoUrl;
   String name;
-  String stylists;
+  List stylists;
 
   CentersData({
     this.centerId,
