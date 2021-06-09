@@ -5,6 +5,7 @@ import 'package:bp/colors.dart';
 import 'package:bp/size_config.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:intl/intl.dart';
 
 class DateTimePage extends StatefulWidget {
   DateTimePage({Key key}) : super(key: key);
@@ -97,53 +98,29 @@ class _DateTimePageState extends State<DateTimePage>
                   appbar(context, text: 'Servicios en lista'),
                   //
                   TabBar(
-                      isScrollable: true,
-                      indicatorColor: Colors.transparent,
-                      labelPadding: EdgeInsets.all(0),
-                      labelColor: Colors.black,
-                      onTap: (value) {
-                        setState(() {
-                          final now = DateTime.now();
-
-                          // print();
-                          day = value;
-                        });
-                      },
-                      // isScrollable: true,
-                      tabs: List.generate(
-                          7,
-                          (index) => Container(
-                                margin: EdgeInsets.symmetric(horizontal: 5),
-                                child: days(index),
-                              ))),
-                  Expanded(
-                    child: TabBarView(children: [
-                      Container(
-                        margin: EdgeInsets.all(20),
-                        child: SingleChildScrollView(
-                          child: Column(
-                            children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Hour(
-                                    hour: '4:00',
-                                  ),
-                                  Text('1')
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
+                    isScrollable: true,
+                    indicatorColor: Colors.transparent,
+                    labelPadding: EdgeInsets.all(0),
+                    labelColor: Colors.black,
+                    onTap: (value) {
+                      setState(() {
+                        day = value;
+                      });
+                    },
+                    // isScrollable: true,
+                    tabs: List.generate(
+                      7,
+                      (index) => Container(
+                        margin: EdgeInsets.symmetric(horizontal: getPSH(5)),
+                        child: days(index),
                       ),
-                      Container(),
-                      Container(),
-                      Container(),
-                      Container(),
-                      Container(),
-                      Container(),
-                    ]),
+                    ),
+                  ),
+                  Expanded(
+                    child: TabBarView(
+                        children: List.generate(7, (index) {
+                      return dayDateBuilder();
+                    })),
                   ),
                 ],
               ),
@@ -212,5 +189,39 @@ class _DateTimePageState extends State<DateTimePage>
               ],
             ),
           );
+  }
+
+  Widget dayDateBuilder() {
+    String currentDay =
+        DateFormat.d().format(DateTime.now().add(Duration(days: day)));
+
+    return StreamBuilder<Object>(
+        stream: null,
+        builder: (context, snapshot) {
+          if ('12' == currentDay) {
+            return Container(
+              margin: EdgeInsets.all(20),
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    ...List.generate(5, (index) {
+                      return Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Hour(
+                            hour: '4:00',
+                          ),
+                          Text('1')
+                        ],
+                      );
+                    })
+                  ],
+                ),
+              ),
+            );
+          } else {
+            return Container();
+          }
+        });
   }
 }

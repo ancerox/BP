@@ -37,7 +37,7 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         theme: themedata(),
         title: 'Material App',
-        initialRoute: 'authWraped',
+        initialRoute: 'dataTime',
       ),
     );
   }
