@@ -1,6 +1,7 @@
 import 'package:bp/Screens/HomePage/Home_page.dart';
 import 'package:bp/Screens/Splash/splash_S.dart';
 import 'package:bp/Screens/center/center_page.dart';
+import 'package:bp/Screens/chat/chat_page.dart';
 import 'package:bp/Screens/codeSms/CodeSms_S.dart';
 import 'package:bp/Screens/log%20in/login_S.dart';
 import 'package:bp/authWrapped.dart';
@@ -18,4 +19,5 @@ Map<String, WidgetBuilder> routes = {
   CenterPage.route: (_) => CenterPage(),
   SplashScreen.route: (_) => SplashScreen(),
   DateTimePage.route: (_) => DateTimePage(),
+  ChatScreen.route: (_) => ChatScreen(),
 };

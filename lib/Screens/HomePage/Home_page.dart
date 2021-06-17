@@ -2,7 +2,7 @@ import 'package:bp/Screens/HomePage/drawer.dart';
 import 'package:bp/services/user_services.dart';
 import 'package:bp/size_config.dart';
 import 'package:bp/services/centers_services.dart';
-import 'package:flutter/services.dart';
+
 import 'package:provider/provider.dart';
 
 import 'package:bp/Components/loadingWidget.dart';
@@ -193,7 +193,6 @@ class _HomePageState extends State<HomePage> {
     return StreamBuilder(
       stream: provider.centerIds,
       builder: (context, snap) {
-        print(snap.data);
         if (snap.data != null) {
           if (snap.data.length > 0) {
             return Column(

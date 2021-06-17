@@ -31,4 +31,12 @@ class UserPreferences {
   set userPhone(String phone) {
     _prefs.setString('phone', phone);
   }
+
+  get userId {
+    return _prefs.getString('userId');
+  }
+
+  set userId(String userName) {
+    _prefs.setString('userId', userName);
+  }
 }

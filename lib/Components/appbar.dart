@@ -8,7 +8,11 @@ Widget appbar(BuildContext context, {text}) {
   SizeConfig().init(context);
   return Row(
     children: [
-      CustomBackButton(),
+      CustomBackButton(
+        pressd: () {
+          Navigator.pop(context);
+        },
+      ),
       Spacer(),
       Text(
         text,

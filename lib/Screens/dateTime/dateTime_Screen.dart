@@ -2,10 +2,13 @@ import 'package:bp/Components/BackButton.dart';
 import 'package:bp/Components/Hour.dart';
 import 'package:bp/Components/appbar.dart';
 import 'package:bp/colors.dart';
+import 'package:bp/models/data_time.dart';
+import 'package:bp/services/centers_services.dart';
 import 'package:bp/size_config.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class DateTimePage extends StatefulWidget {
   DateTimePage({Key key}) : super(key: key);
@@ -191,37 +194,26 @@ class _DateTimePageState extends State<DateTimePage>
           );
   }
 
-  Widget dayDateBuilder() {
-    String currentDay =
+  dayDateBuilder() {
+    String tappedDay =
         DateFormat.d().format(DateTime.now().add(Duration(days: day)));
 
-    return StreamBuilder<Object>(
-        stream: null,
-        builder: (context, snapshot) {
-          if ('12' == currentDay) {
-            return Container(
-              margin: EdgeInsets.all(20),
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    ...List.generate(5, (index) {
-                      return Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Hour(
-                            hour: '4:00',
-                          ),
-                          Text('1')
-                        ],
-                      );
-                    })
-                  ],
-                ),
-              ),
-            );
-          } else {
-            return Container();
-          }
-        });
+    final stylistId = ModalRoute.of(context).settings.arguments;
+    final provider = Provider.of<CenterProivder>(context, listen: false)
+        .apoiments(stylistId);
+
+    return Column(
+      children: [
+        ...List.generate(2, (index) {
+          return StreamBuilder(
+            stream: provider,
+            builder: (contex, snap) {
+              // print(snap.data);
+              return Container();
+            },
+          );
+        })
+      ],
+    );
   }
 }

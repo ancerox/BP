@@ -1,3 +1,4 @@
+import 'package:bp/user_preferences.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 
@@ -10,6 +11,10 @@ class AuthWraped extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
+
+    final prefs = UserPreferences();
+
+    prefs.userId = user.uid;
 
     if (user != null) {
       return HomePage();

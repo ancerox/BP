@@ -1,4 +1,3 @@
-import 'package:bp/Components/BackButton.dart';
 import 'package:bp/Components/loadingWidget.dart';
 import 'package:bp/Screens/center/stylist_card.dart';
 import 'package:bp/colors.dart';
@@ -8,9 +7,10 @@ import 'package:bp/services/centers_services.dart';
 
 import 'package:bp/size_config.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+
 import 'package:provider/provider.dart';
 
+import '../../user_preferences.dart';
 import 'image_center.dart';
 
 class CenterPage extends StatefulWidget {
@@ -25,6 +25,18 @@ class _CenterPageState extends State<CenterPage> {
   Widget build(BuildContext context) {
     final CentersData centersData = ModalRoute.of(context).settings.arguments;
     SizeConfig().init(context);
+
+    final prefs = UserPreferences();
+
+    final chatRoomId = Provider.of<CenterProivder>(context)
+        .getChatRoomId(prefs.userId, '18298281232');
+
+    Map<String, dynamic> chatRoominfoMap = {
+      "users": [prefs.userId, '18298281232'],
+    };
+
+    Provider.of<CenterProivder>(context)
+        .createChatRoom(chatRoomId, chatRoominfoMap);
 
     return Scaffold(
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
@@ -89,17 +101,18 @@ class _CenterPageState extends State<CenterPage> {
   }
 
   Column buildStylistsList(CentersData centersData) {
-    final stylists = Provider.of<CenterProivder>(context, listen: false);
+    final stylist = Provider.of<CenterProivder>(context, listen: false);
 
     return Column(
       children: List.generate(
         centersData.stylists.length,
         (index) => StreamBuilder<StylistData>(
-            stream: stylists.stylitys(centersData.stylists[index]),
+            stream: stylist.stylitys(centersData.stylists[index]),
             builder: (context, snap) {
               if (snap.data != null) {
                 return StylistsCard(
                   data: snap.data,
+                  stylisyId: centersData.stylists[index],
                 );
               } else {
                 return LoadingWidget();
