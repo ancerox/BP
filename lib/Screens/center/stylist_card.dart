@@ -1,8 +1,6 @@
 import 'package:bp/models/stylists.dart';
-import 'package:bp/services/centers_services.dart';
-import 'package:bp/user_preferences.dart';
+
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 import '../../colors.dart';
 import '../../size_config.dart';
@@ -11,17 +9,19 @@ class StylistsCard extends StatelessWidget {
   const StylistsCard({
     Key key,
     @required this.data,
-    this.stylisyId,
+    this.stylistId,
   }) : super(key: key);
 
   final StylistData data;
-  final String stylisyId;
+  final String stylistId;
 
   @override
   Widget build(BuildContext context) {
+    final List stylistList = [data, stylistId];
+
     return InkWell(
       onTap: () {
-        Navigator.pushNamed(context, 'dataTime', arguments: stylisyId);
+        Navigator.pushNamed(context, 'dataTime', arguments: stylistId);
       },
       child: Container(
         margin: EdgeInsets.symmetric(vertical: getPSH(10)),
@@ -94,7 +94,7 @@ class StylistsCard extends StatelessWidget {
             Spacer(),
             GestureDetector(
               onTap: () {
-                Navigator.pushNamed(context, 'chat', arguments: data);
+                Navigator.pushNamed(context, 'chat', arguments: stylistList);
               },
               child: Container(
                 height: 40,

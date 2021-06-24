@@ -20,23 +20,15 @@ class CenterPage extends StatefulWidget {
   _CenterPageState createState() => _CenterPageState();
 }
 
+int indexChatRooms = 0;
+final prefs = UserPreferences();
+
 class _CenterPageState extends State<CenterPage> {
   @override
   Widget build(BuildContext context) {
     final CentersData centersData = ModalRoute.of(context).settings.arguments;
     SizeConfig().init(context);
-
-    final prefs = UserPreferences();
-
-    final chatRoomId = Provider.of<CenterProivder>(context)
-        .getChatRoomId(prefs.userId, '18298281232');
-
-    Map<String, dynamic> chatRoominfoMap = {
-      "users": [prefs.userId, '18298281232'],
-    };
-
-    Provider.of<CenterProivder>(context)
-        .createChatRoom(chatRoomId, chatRoominfoMap);
+    dataToInit(centersData);
 
     return Scaffold(
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
@@ -100,19 +92,31 @@ class _CenterPageState extends State<CenterPage> {
     );
   }
 
+  dataToInit(CentersData centersData) {}
+
   Column buildStylistsList(CentersData centersData) {
-    final stylist = Provider.of<CenterProivder>(context, listen: false);
+    final provider = Provider.of<CenterProivder>(context, listen: false);
 
     return Column(
       children: List.generate(
         centersData.stylists.length,
         (index) => StreamBuilder<StylistData>(
-            stream: stylist.stylitys(centersData.stylists[index]),
+            stream: provider.stylitys(centersData.stylists[index]),
             builder: (context, snap) {
               if (snap.data != null) {
+                final chatRoomId = provider.getChatRoomId(
+                    prefs.userId, centersData.stylists[index]);
+
+// users of chatRoom
+                Map<String, dynamic> chatRoominfoMap = {
+                  "users": [prefs.userId, centersData.stylists[index]],
+                };
+
+//Create a chat room if doesnt exist
+                provider.createChatRoom(chatRoomId, chatRoominfoMap);
                 return StylistsCard(
                   data: snap.data,
-                  stylisyId: centersData.stylists[index],
+                  stylistId: centersData.stylists[index],
                 );
               } else {
                 return LoadingWidget();

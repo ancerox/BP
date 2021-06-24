@@ -14,6 +14,8 @@ class AuthWraped extends StatelessWidget {
 
     final prefs = UserPreferences();
 
+    // print(user);
+
     prefs.userId = user.uid;
 
     if (user != null) {

@@ -71,7 +71,7 @@ class _HomePageState extends State<HomePage> {
             );
           } else {
             return Center(
-              child: LoadingWidget(),
+              child: Container(),
             );
           }
         });

@@ -1,4 +1,7 @@
+import 'dart:math';
+
 import 'package:bp/models/beauty_centers.dart';
+import 'package:bp/models/chatmodel.dart';
 import 'package:bp/models/data_time.dart';
 import 'package:bp/models/stylists.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -105,15 +108,14 @@ class CenterProivder with ChangeNotifier {
 
     chatroomPass = chatRoom;
 
-    if (snapshot.exists) {
+    if (snapshot.data == null) {
       return true;
     } else {
       return await chatRooms.doc(chatRoom).set(chatRoominfoMap);
     }
   }
 
-  Future<Stream<QuerySnapshot>> getChatRoomMessages(String chatRoomId) async {
-    print(chatRooms);
+  Stream<QuerySnapshot> getChatRoomMessages(String chatRoomId) {
     return chatRooms
         .doc(chatRoomId)
         .collection('chats')

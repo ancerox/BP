@@ -1,13 +1,17 @@
-import 'package:bp/Components/loadingWidget.dart';
-import 'package:bp/colors.dart';
-import 'package:bp/models/stylists.dart';
+import 'package:flutter/material.dart';
+import 'package:bp/user_preferences.dart';
 import 'package:bp/services/centers_services.dart';
 import 'package:bp/size_config.dart';
-import 'package:bp/user_preferences.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
+
+import 'package:bp/colors.dart';
+import 'package:bp/models/chatmodel.dart';
+import 'package:bp/models/stylists.dart';
+
+import 'package:bp/Components/loadingWidget.dart';
 import 'package:provider/provider.dart';
 import 'package:random_string/random_string.dart';
+
+import 'BubbleChat.dart';
 
 class ChatScreen extends StatefulWidget {
   @override
@@ -15,27 +19,29 @@ class ChatScreen extends StatefulWidget {
   static String route = "chat";
 }
 
+final prefs = UserPreferences();
+
 TextEditingController _textMessageCtrl = new TextEditingController();
 Stream messageStream;
 
 class _ChatScreenState extends State<ChatScreen> {
   @override
   Widget build(BuildContext context) {
-    StylistData stylistData = ModalRoute.of(context).settings.arguments;
-    final provider = Provider.of<CenterProivder>(context);
+    CenterProivder provider = Provider.of<CenterProivder>(context);
+    List stylistData = ModalRoute.of(context).settings.arguments;
 
     return Scaffold(
       appBar: AppBar(
         iconTheme: IconThemeData(color: Colors.white),
         backgroundColor: kSecundary,
         title: Text(
-          stylistData.name,
+          stylistData[0].name,
           style: TextStyle(),
         ),
       ),
       body: Column(
         children: [
-          Expanded(child: chatStream()),
+          Expanded(child: chatStream(provider, stylistData[1])),
           Container(
             alignment: Alignment.center,
             decoration: BoxDecoration(
@@ -44,7 +50,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 BoxShadow(
                   offset: Offset(0, 4),
                   blurRadius: 32,
-                  color: Color(0xFF087949).withOpacity(0.08),
+                  color: Color(0xFF087949).withOpacity(0.1),
                 ),
               ],
             ),
@@ -67,8 +73,9 @@ class _ChatScreenState extends State<ChatScreen> {
                       children: [
                         Expanded(
                           child: TextField(
+                            autocorrect: false,
                             onSubmitted: (value) async {
-                              await addMessage(provider);
+                              await addMessage(provider, stylistData[1]);
                               _textMessageCtrl.clear();
                             },
                             controller: _textMessageCtrl,
@@ -107,57 +114,42 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  @override
-  void initState() {
-    super.initState();
-    Future.delayed(Duration.zero, () {
-      final provider = Provider.of<CenterProivder>(context, listen: false);
-      this.getAndSetMessages(provider);
-    });
-  }
+  Future addMessage(provider, String stylistData) async {
+    DateTime now = DateTime.now();
 
-  getAndSetMessages(provider) async {
-    messageStream = await provider
-        .getChatRoomMessages('18298281232_DUpa3HUZOHZ7qlEaYjX60ZzFTYg1');
-    setState(() {});
-  }
-
-  Future addMessage(provider) async {
     if (_textMessageCtrl.text.isEmpty) return;
-    final prefs = UserPreferences();
-    final now = DateTime.now();
+
+    String messageId;
 
     Map<String, dynamic> messageInfoMap = {
       "message": _textMessageCtrl.text,
       "sendBy": prefs.userId,
       "ts": now
     };
-    if (messageId == "") {
-      messageId = randomAlpha(12);
+
+    if (messageId == '') {
+      messageId = randomAlphaNumeric(12);
     }
 
-    final chatRoomId = provider.getChatRoomId(prefs.userId, '18298281232');
+    final chatRoomId = provider.getChatRoomId(prefs.userId, stylistData);
 
-    await provider
-        .addMessage(chatRoomId, messageId, messageInfoMap)
-        .then((value) {
-      Map<String, dynamic> lastMessageInfoMap = {
-        "lastMessage": _textMessageCtrl.text,
-        "lastMessageSentTs": now,
-        "lastMessageSendBy": prefs.userId
-      };
-      provider.updateLastMessageSent(chatRoomId, lastMessageInfoMap);
-    });
-
-    // _textMessageCtrl.clear();
+    await provider.addMessage(chatRoomId, messageId, messageInfoMap).then(
+      (value) {
+        Map<String, dynamic> lastMessageInfoMap = {
+          "lastMessage": _textMessageCtrl.text,
+          "lastMessageSentTs": now,
+          "lastMessageSendBy": prefs.userId
+        };
+        provider.updateLastMessageSent(chatRoomId, lastMessageInfoMap);
+      },
+    );
   }
-
-  String messageId;
 }
 
-Widget chatStream() {
+StreamBuilder chatStream(CenterProivder provider, String stylistData) {
   return StreamBuilder(
-    stream: messageStream,
+    stream: provider
+        .getChatRoomMessages(provider.getChatRoomId(prefs.userId, stylistData)),
     builder: (context, snap) {
       return snap.hasData
           ? ListView.builder(
@@ -165,34 +157,12 @@ Widget chatStream() {
               shrinkWrap: true,
               itemCount: snap.data.docs.length,
               itemBuilder: (context, index) {
-                DocumentSnapshot data = snap.data.docs[index];
-                return Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Container(
-                      alignment: Alignment.centerRight,
-                      margin: EdgeInsets.symmetric(
-                          horizontal: getPSW(10), vertical: getPSH(5)),
-                      padding: EdgeInsets.all(getPSW(10)),
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(getPSW(20)),
-                              topRight: Radius.circular(getPSW(20)),
-                              bottomLeft: Radius.circular(getPSW(20)),
-                              bottomRight: Radius.circular(getPSW(0))),
-                          color: kPrimeryColor),
-                      child: Text(
-                        data['message'],
-                        overflow: TextOverflow.visible,
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
-                          fontSize: getPSW(14),
-                        ),
-                      ),
-                    ),
-                  ],
-                );
+                ChatModel message = ChatModel(
+                    message: snap.data.docs[index]['message'],
+                    sendBy: snap.data.docs[index]['sendBy'],
+                    ts: snap.data.docs[index]['ts']);
+
+                return BubbleChat(data: message);
               })
           : LoadingWidget();
     },
