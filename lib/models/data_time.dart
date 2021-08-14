@@ -1,5 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Apoiment {
-  String dateTime;
+  Timestamp dateTime;
 
   Apoiment({this.dateTime});
 }

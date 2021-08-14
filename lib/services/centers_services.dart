@@ -33,11 +33,11 @@ class CenterProivder with ChangeNotifier {
   Stream<CentersData> centerData(String centerIds) {
     return centersCollection.doc(centerIds).snapshots().map((event) {
       return CentersData(
-        fotoUrl: event.get('fotoUrl'),
-        centerId: event.get('centerId'),
-        name: event.get('name'),
-        stylists: event.get('stylists'),
-      );
+          fotoUrl: event.get('fotoUrl'),
+          centerId: event.get('centerId'),
+          name: event.get('name'),
+          stylists: event.get('stylists'),
+          availability: event.get('availability'));
     });
   }
 
@@ -67,18 +67,16 @@ class CenterProivder with ChangeNotifier {
       return StylistData(
           name: data.get('name'),
           isActive: data.get('isActive'),
-          photoUrl: data.get('photoUrl'));
+          photoUrl: data.get('photoUrl'),
+          availability: data.get('availability'));
     });
   }
 
-  Stream apoiments(String stylistId) {
+  Stream<QuerySnapshot> apoiments(String stylistId) {
     return stylistsCollection
         .doc(stylistId)
         .collection('apoiments')
-        .snapshots()
-        .map((e) {
-      e.docs.map((e) => print(e.data()));
-    });
+        .snapshots();
   }
 
   getChatRoomId(String a, String b) {

@@ -25,8 +25,10 @@ TextEditingController _textMessageCtrl = new TextEditingController();
 Stream messageStream;
 
 class _ChatScreenState extends State<ChatScreen> {
+  //
   @override
   Widget build(BuildContext context) {
+    //
     CenterProivder provider = Provider.of<CenterProivder>(context);
     List stylistData = ModalRoute.of(context).settings.arguments;
 

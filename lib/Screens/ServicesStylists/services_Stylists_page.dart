@@ -22,7 +22,7 @@ class _ServicesStylistsState extends State<ServicesStylists> {
           child: Column(
             children: [
               //
-              Expanded(child: appbar(context, text: 'Agregar Servicio')),
+              // Expanded(child: appbar(context, text: 'Agregar Servicio')),
               Spacer(),
               //
               // setHour(),

@@ -19,7 +19,7 @@ class _LobbyPageState extends State<LobbyPage> {
       body: SafeArea(
         child: Column(
           children: [
-            appbar(context, text: 'Tu servicio'),
+            // appbar(context, text: 'Tu servicio',),
             SizedBox(
               height: getPSH(20),
             ),
