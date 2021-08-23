@@ -1,4 +1,5 @@
-import 'package:bp/Components/Hour.dart';
+import 'dart:async';
+
 import 'package:bp/Components/appbar.dart';
 import 'package:bp/Components/loadingWidget.dart';
 import 'package:bp/colors.dart';
@@ -11,6 +12,8 @@ import 'package:flutter/rendering.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
+import 'date_day_builder.dart';
+
 class DateTimePage extends StatefulWidget {
   DateTimePage({Key key}) : super(key: key);
 
@@ -21,22 +24,23 @@ class DateTimePage extends StatefulWidget {
 }
 
 List<String> listOfDays = [
-  "lun",
-  "mar",
-  "mie",
-  "jue",
-  "vie",
-  "sab",
-  "dom",
+  "lunes",
+  "martes",
+  "miercoles",
+  "jueves",
+  "viernes",
+  "sabado",
+  "domingo",
 ];
 
 class _DateTimePageState extends State<DateTimePage>
     with SingleTickerProviderStateMixin {
   TabController _controller;
-
+  Stream data;
   @override
   initState() {
     super.initState();
+
     _controller = TabController(
       length: 7,
       vsync: this,
@@ -53,7 +57,9 @@ class _DateTimePageState extends State<DateTimePage>
   @override
   Widget build(BuildContext context) {
     String stylistId = ModalRoute.of(context).settings.arguments;
-    final apoiments = Provider.of<CenterProivder>(context).apoiments(stylistId);
+    final provider = Provider.of<CenterProivder>(context);
+
+    Stream<StylistData> stylist = provider.stylitys(stylistId);
 
 //  StylistData provider = Provider.of<CenterProivder>(context).stylitys(modalRoute);
 
@@ -67,7 +73,9 @@ class _DateTimePageState extends State<DateTimePage>
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             TextButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.pushNamed(context, 'stylistServices');
+                },
                 child: Container(
                     child: Center(
                         child: Text(
@@ -111,8 +119,10 @@ class _DateTimePageState extends State<DateTimePage>
           child: Column(
             children: [
               //
-              appbar(context, 'Servicios en lista de', 'nombre'),
-              //
+              appbar(context, 'Servicios en lista de', stylist),
+              SizedBox(
+                height: getPSH(20),
+              ),
               TabBar(
                 controller: _controller,
                 physics: NeverScrollableScrollPhysics(),
@@ -137,22 +147,53 @@ class _DateTimePageState extends State<DateTimePage>
               ),
               SizedBox(height: getPSW(10)),
               Center(
-                  child: Text(
-                'Abierto de 8:00 Am a 7:50 Pm ',
-                style: TextStyle(
-                    fontSize: getPSH(17), fontWeight: FontWeight.w500),
-              )),
+                child: StreamBuilder<StylistData>(
+                    stream: stylist,
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData ||
+                          snapshot.connectionState == ConnectionState.done) {
+                        final openDataHour =
+                            snapshot.data.availability['$day'][0].toDate();
+                        final closeDataHour =
+                            snapshot.data.availability['$day'][1].toDate();
+
+                        final entrada =
+                            DateFormat('h:mma').format(openDataHour);
+                        final salida =
+                            DateFormat('h:mma').format(closeDataHour);
+
+                        return Text(
+                          snapshot.connectionState == ConnectionState.done ||
+                                  snapshot.hasData
+                              ? 'Abierto desde $entrada hasta $salida'
+                              : 'Los datos no han cargado',
+                          style: TextStyle(
+                              fontSize: getPSH(17),
+                              fontWeight: FontWeight.w500),
+                        );
+                      } else {
+                        return LoadingWidget();
+                      }
+                    }),
+              ),
               SizedBox(height: getPSH(20)),
+              // noApoimentsText(provider, stylistId),
+              SizedBox(
+                height: getPSH(20),
+              ),
               Expanded(
                 child: TabBarView(
                     controller: _controller,
                     physics: NeverScrollableScrollPhysics(),
                     children: [
-                      ...List.generate(
-                          7,
-                          (index) => day == index
-                              ? DayDateBuilder(stream: apoiments, day: day)
-                              : Container())
+                      ...List.generate(7, (index) {
+                        if (day == index) {
+                          return DayDateBuilder(
+                              stream: provider.apoiments(stylistId), day: day);
+                        } else {
+                          return Container();
+                        }
+                      })
                     ]),
               ),
             ],
@@ -178,13 +219,19 @@ class _DateTimePageState extends State<DateTimePage>
                 Text(
                   listOfDays[
                           DateTime.now().add(Duration(days: index)).weekday - 1]
-                      .toString(),
+                      .toString()
+                      .substring(0, 3),
                   style: TextStyle(
                       fontSize: getPSH(16),
                       fontWeight: FontWeight.w800,
                       color: Colors.white),
                 ),
-                Text(DateTime.now().add(Duration(days: index)).day.toString(),
+                Text(
+                    DateTime.now()
+                        .add(Duration(days: index))
+                        .day
+                        .toString()
+                        .substring(0, 2),
                     style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w600,
@@ -207,13 +254,19 @@ class _DateTimePageState extends State<DateTimePage>
                 Text(
                   listOfDays[
                           DateTime.now().add(Duration(days: index)).weekday - 1]
-                      .toString(),
+                      .toString()
+                      .substring(0, 3),
                   style: TextStyle(
                       fontSize: 17,
                       fontWeight: FontWeight.w600,
                       color: Color(0xffCACACA)),
                 ),
-                Text(DateTime.now().add(Duration(days: index)).day.toString(),
+                Text(
+                    DateTime.now()
+                        .add(Duration(days: index))
+                        .day
+                        .toString()
+                        .substring(0, 2),
                     style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w500,
@@ -227,92 +280,4 @@ class _DateTimePageState extends State<DateTimePage>
             ),
           );
   }
-
-  dayDateBuilder(String stylistId, apoiments) {
-    print('Is repeate?');
-
-    return Container();
-  }
-}
-/*   */
-
-class DayDateBuilder extends StatefulWidget {
-  final stream;
-  final day;
-
-  const DayDateBuilder({Key key, @required this.stream, @required this.day})
-      : super(key: key);
-
-  @override
-  _DayDateBuilderState createState() => _DayDateBuilderState();
-}
-
-class _DayDateBuilderState extends State<DayDateBuilder>
-    with AutomaticKeepAliveClientMixin<DayDateBuilder> {
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    super.build(context);
-    return StreamBuilder(
-        stream: widget.stream,
-        builder: (context, snap) {
-          if (snap.data != null) {
-            return ListView.builder(
-                itemCount: snap.data.docs.length,
-                itemBuilder: (context, index) {
-                  final date = snap.data.docs[index]['hour'];
-                  DateTime dateTime = date.toDate();
-
-                  final dateDay =
-                      DateTime.now().add(Duration(days: widget.day));
-
-                  print(dateDay.hour);
-
-                  final hora = DateFormat('h:mma').format(dateTime);
-                  return Container(
-                    margin: EdgeInsets.symmetric(horizontal: getPSW(20)),
-                    child: dateDay.day == dateTime.day &&
-                            dateTime.hour >= dateDay.hour
-                        ? Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Hour(
-                                hour: '$hora',
-                              ),
-                              Spacer(),
-                              Container(
-                                width: getPSW(230),
-                                height: getPSH(55),
-                                decoration: BoxDecoration(
-                                    borderRadius:
-                                        BorderRadius.circular(getPSW(10)),
-                                    color: kSecundary),
-                                child: Center(
-                                  child: Text(
-                                    'Ocupado',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: getPSW(16),
-                                    ),
-                                  ),
-                                ),
-                              )
-                            ],
-                          )
-                        : Container(),
-                  );
-                });
-          } else {
-            return LoadingWidget();
-          }
-        });
-  }
-
-  @override
-  bool get wantKeepAlive => true;
 }

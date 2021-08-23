@@ -6,23 +6,19 @@ import '../../colors.dart';
 import '../../size_config.dart';
 
 class StylistsCard extends StatelessWidget {
-  const StylistsCard({
-    Key key,
-    @required this.data,
-    this.stylistId,
-  }) : super(key: key);
+  const StylistsCard({Key key, @required this.data, this.stylistId, this.onTap})
+      : super(key: key);
 
   final StylistData data;
   final String stylistId;
+  final Function onTap;
 
   @override
   Widget build(BuildContext context) {
     final List stylistList = [data, stylistId];
 
     return InkWell(
-      onTap: () {
-        Navigator.pushNamed(context, 'dataTime', arguments: stylistId);
-      },
+      onTap: onTap,
       child: Container(
         margin: EdgeInsets.symmetric(vertical: getPSH(10)),
         height: getPSH(90),

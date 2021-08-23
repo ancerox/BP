@@ -8,6 +8,7 @@ import 'package:bp/authWrapped.dart';
 import 'package:flutter/material.dart';
 
 import 'Screens/Register/Register_P.dart';
+import 'Screens/ServicesStylists/services_Stylists_page.dart';
 import 'Screens/dateTime/dateTime_Screen.dart';
 
 Map<String, WidgetBuilder> routes = {
@@ -20,4 +21,5 @@ Map<String, WidgetBuilder> routes = {
   SplashScreen.route: (_) => SplashScreen(),
   DateTimePage.route: (_) => DateTimePage(),
   ChatScreen.route: (_) => ChatScreen(),
+  ServicesStylists.route: (_) => ServicesStylists(),
 };

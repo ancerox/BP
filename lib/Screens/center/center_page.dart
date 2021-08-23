@@ -23,6 +23,12 @@ class CenterPage extends StatefulWidget {
 int indexChatRooms = 0;
 final prefs = UserPreferences();
 
+String stylistId;
+bool isSelected = false;
+
+@override
+void initState() {}
+
 class _CenterPageState extends State<CenterPage> {
   @override
   Widget build(BuildContext context) {
@@ -36,22 +42,27 @@ class _CenterPageState extends State<CenterPage> {
         alignment: Alignment.bottomCenter,
         child: Container(
             decoration: BoxDecoration(
-                color: kSecundary, borderRadius: BorderRadius.circular(20)),
+                color: isSelected ? kSecundary : Colors.grey,
+                borderRadius: BorderRadius.circular(20)),
             width: getPSW(270),
             height: getPSH(55),
             child: new RawMaterialButton(
-              child: Text(
-                'Solicitar Servicio',
-                style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w500,
-                    fontSize: 20),
-              ),
-              onPressed: () {
-                DateTime now = DateTime.now();
-                print(now.hour);
-              },
-            )),
+                child: Text(
+                  'Ver disponibilidad',
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w500,
+                      fontSize: 20),
+                ),
+                onPressed: isSelected
+                    ? () {
+                        Navigator.pushNamed(context, 'dataTime',
+                            arguments: stylistId);
+                        setState(() {
+                          isSelected = false;
+                        });
+                      }
+                    : null)),
       ),
       body: CustomScrollView(
         slivers: [
@@ -80,7 +91,9 @@ class _CenterPageState extends State<CenterPage> {
                           ),
                         ),
                       ),
-                      buildStylistsList(centersData),
+                      buildStylistsList(
+                        centersData,
+                      ),
                     ],
                   ),
                 )
@@ -113,8 +126,15 @@ class _CenterPageState extends State<CenterPage> {
                 };
 
 //Create a chat room if doesnt exist
+
                 provider.createChatRoom(chatRoomId, chatRoominfoMap);
                 return StylistsCard(
+                  onTap: () {
+                    setState(() {
+                      isSelected = true;
+                      stylistId = centersData.stylists[index];
+                    });
+                  },
                   data: snap.data,
                   stylistId: centersData.stylists[index],
                 );

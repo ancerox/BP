@@ -1,13 +1,15 @@
+import 'package:bp/Components/BackButton.dart';
 import 'package:bp/Components/appbar.dart';
 import 'package:bp/Components/customButton.dart';
 import 'package:bp/colors.dart';
 import 'package:bp/size_config.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_time_picker_spinner/flutter_time_picker_spinner.dart';
 
 class ServicesStylists extends StatefulWidget {
   ServicesStylists({Key key}) : super(key: key);
-
+  static String route = 'stylistServices';
   @override
   _ServicesStylistsState createState() => _ServicesStylistsState();
 }
@@ -22,13 +24,14 @@ class _ServicesStylistsState extends State<ServicesStylists> {
           child: Column(
             children: [
               //
-              // Expanded(child: appbar(context, text: 'Agregar Servicio')),
+              appBar(),
               Spacer(),
               //
-              // setHour(),
+              setHour(),
+              Spacer(),
               //
-              Expanded(flex: 4, child: servicesSt()),
-              Expanded(flex: 2, child: Container()),
+              Expanded(flex: 7, child: servicesSt()),
+              Expanded(flex: 1, child: Container()),
 
               CustomButton(
                   text: 'Confirmar Servicio',
@@ -43,7 +46,40 @@ class _ServicesStylistsState extends State<ServicesStylists> {
     );
   }
 
-  setHour() {}
+  setHour() {
+    return Container(
+      // padding: EdgeInsets.all(20),
+      height: getPSH(120),
+      width: double.infinity,
+      decoration: BoxDecoration(
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.2),
+            spreadRadius: 5,
+            blurRadius: 6,
+            offset: Offset(0, 3), // changes position of shadow
+          ),
+        ],
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(15),
+      ),
+      child: TimePickerSpinner(
+        alignment: Alignment.centerLeft,
+        is24HourMode: false,
+        // normalTextStyle: TextStyle(fontSize: 24, color: Colors.deepOrange),
+        highlightedTextStyle:
+            TextStyle(fontSize: getPSH(25), color: kSecundary),
+        spacing: getPSH(10),
+        itemHeight: getPSH(40),
+        isForce2Digits: true,
+        onTimeChange: (time) {
+          setState(() {
+            // _dateTime = time;
+          });
+        },
+      ),
+    );
+  }
 
   Container servicesSt() {
     return Container(
@@ -252,5 +288,28 @@ class _ServicesStylistsState extends State<ServicesStylists> {
             ),
           );
         });
+  }
+
+  appBar() {
+    return Row(
+      children: [
+        CustomBackButton(
+          pressd: () {
+            Navigator.pop(context);
+          },
+        ),
+        Spacer(),
+        Text(
+          'Agregar Servicio',
+          style: TextStyle(
+              fontSize: getPSH(20),
+              color: kPrimeryColor,
+              fontWeight: FontWeight.w800),
+        ),
+        Spacer(
+          flex: 2,
+        ),
+      ],
+    );
   }
 }

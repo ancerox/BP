@@ -65,17 +65,19 @@ class CenterProivder with ChangeNotifier {
   Stream<StylistData> stylitys(String stylistId) {
     return stylistsCollection.doc(stylistId).snapshots().map((data) {
       return StylistData(
-          name: data.get('name'),
-          isActive: data.get('isActive'),
-          photoUrl: data.get('photoUrl'),
-          availability: data.get('availability'));
+        name: data.get('name'),
+        isActive: data.get('isActive'),
+        photoUrl: data.get('photoUrl'),
+        availability: data.get('availability'),
+      );
     });
   }
 
-  Stream<QuerySnapshot> apoiments(String stylistId) {
+  Stream apoiments(String stylistId) {
     return stylistsCollection
         .doc(stylistId)
         .collection('apoiments')
+        .orderBy('hour', descending: false)
         .snapshots();
   }
 
@@ -119,6 +121,10 @@ class CenterProivder with ChangeNotifier {
         .collection('chats')
         .orderBy('ts', descending: true)
         .snapshots();
+  }
+
+  Stream defaultAb(String stylistId) {
+    return stylistsCollection.doc(stylistId).snapshots();
   }
 }
 //  return Apoiment(dateTime: data.docs);
