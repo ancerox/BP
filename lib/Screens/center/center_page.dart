@@ -66,7 +66,7 @@ class _CenterPageState extends State<CenterPage> {
       ),
       body: CustomScrollView(
         slivers: [
-          imageCenter(centersData, context),
+          imageCenter(centersData, context, popOut),
           SliverList(
             delegate: SliverChildListDelegate(
               [
@@ -103,6 +103,11 @@ class _CenterPageState extends State<CenterPage> {
         ],
       ),
     );
+  }
+
+  popOut() {
+    Navigator.pop(context);
+    isSelected = false;
   }
 
   dataToInit(CentersData centersData) {}

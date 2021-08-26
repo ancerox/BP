@@ -37,6 +37,7 @@ class _DateTimePageState extends State<DateTimePage>
     with SingleTickerProviderStateMixin {
   TabController _controller;
   Stream data;
+  DateTime dateTime;
   @override
   initState() {
     super.initState();
@@ -74,7 +75,11 @@ class _DateTimePageState extends State<DateTimePage>
           children: [
             TextButton(
                 onPressed: () {
-                  Navigator.pushNamed(context, 'stylistServices');
+                  Navigator.pushNamed(
+                    context,
+                    'stylistServices',
+                    arguments: [dateTime, stylistId],
+                  );
                 },
                 child: Container(
                     child: Center(
@@ -187,6 +192,8 @@ class _DateTimePageState extends State<DateTimePage>
                     physics: NeverScrollableScrollPhysics(),
                     children: [
                       ...List.generate(7, (index) {
+                        dateTime = DateTime.now().add(Duration(days: day));
+
                         if (day == index) {
                           return DayDateBuilder(
                               stream: provider.apoiments(stylistId), day: day);

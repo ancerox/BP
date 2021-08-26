@@ -113,7 +113,7 @@ class _HomePageState extends State<HomePage> {
                       fontStyle: FontStyle.normal,
                       fontWeight: FontWeight.w500,
                       height: 1.2,
-                      fontSize: getPSH(25)),
+                      fontSize: getPSH(22)),
                 )
               ],
               //

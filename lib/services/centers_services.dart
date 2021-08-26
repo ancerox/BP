@@ -65,11 +65,11 @@ class CenterProivder with ChangeNotifier {
   Stream<StylistData> stylitys(String stylistId) {
     return stylistsCollection.doc(stylistId).snapshots().map((data) {
       return StylistData(
-        name: data.get('name'),
-        isActive: data.get('isActive'),
-        photoUrl: data.get('photoUrl'),
-        availability: data.get('availability'),
-      );
+          name: data.get('name'),
+          isActive: data.get('isActive'),
+          photoUrl: data.get('photoUrl'),
+          availability: data.get('availability'),
+          services: data.get('services'));
     });
   }
 

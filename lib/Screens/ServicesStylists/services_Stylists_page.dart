@@ -1,11 +1,15 @@
 import 'package:bp/Components/BackButton.dart';
-import 'package:bp/Components/appbar.dart';
+
 import 'package:bp/Components/customButton.dart';
 import 'package:bp/colors.dart';
+import 'package:bp/models/stylists.dart';
+import 'package:bp/services/centers_services.dart';
 import 'package:bp/size_config.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_time_picker_spinner/flutter_time_picker_spinner.dart';
+import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class ServicesStylists extends StatefulWidget {
   ServicesStylists({Key key}) : super(key: key);
@@ -14,9 +18,15 @@ class ServicesStylists extends StatefulWidget {
   _ServicesStylistsState createState() => _ServicesStylistsState();
 }
 
+DateTime now = new DateTime.now();
+TimeOfDay timeOfDay;
+
 class _ServicesStylistsState extends State<ServicesStylists> {
   @override
   Widget build(BuildContext context) {
+    List data = ModalRoute.of(context).settings.arguments;
+    Intl.defaultLocale = 'es';
+
     return Scaffold(
       body: SafeArea(
         child: Container(
@@ -27,10 +37,10 @@ class _ServicesStylistsState extends State<ServicesStylists> {
               appBar(),
               Spacer(),
               //
-              setHour(),
+              setHour(timeOfDay, data[0]),
               Spacer(),
               //
-              Expanded(flex: 7, child: servicesSt()),
+              Expanded(flex: 7, child: servicesSt(data[1])),
               Expanded(flex: 1, child: Container()),
 
               CustomButton(
@@ -46,45 +56,12 @@ class _ServicesStylistsState extends State<ServicesStylists> {
     );
   }
 
-  setHour() {
-    return Container(
-      // padding: EdgeInsets.all(20),
-      height: getPSH(120),
-      width: double.infinity,
-      decoration: BoxDecoration(
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.2),
-            spreadRadius: 5,
-            blurRadius: 6,
-            offset: Offset(0, 3), // changes position of shadow
-          ),
-        ],
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(15),
-      ),
-      child: TimePickerSpinner(
-        alignment: Alignment.centerLeft,
-        is24HourMode: false,
-        // normalTextStyle: TextStyle(fontSize: 24, color: Colors.deepOrange),
-        highlightedTextStyle:
-            TextStyle(fontSize: getPSH(25), color: kSecundary),
-        spacing: getPSH(10),
-        itemHeight: getPSH(40),
-        isForce2Digits: true,
-        onTimeChange: (time) {
-          setState(() {
-            // _dateTime = time;
-          });
-        },
-      ),
-    );
-  }
+  setHour(TimeOfDay hour, DateTime daySelected) {
+    String daySelectedString = DateFormat('EEEE dd').format(daySelected);
 
-  Container servicesSt() {
     return Container(
-        // padding: EdgeInsets.all(20),
-        height: getPSH(400),
+        padding: EdgeInsets.all(20),
+        height: getPSH(115),
         width: double.infinity,
         decoration: BoxDecoration(
           boxShadow: [
@@ -101,67 +78,168 @@ class _ServicesStylistsState extends State<ServicesStylists> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              margin: EdgeInsets.all(10),
-              child: Text(
-                'Servicios',
-                style: TextStyle(fontSize: getPSH(16)),
-              ),
-            ),
-            Divider(
-              thickness: 2,
-            ),
-            SizedBox(
-              height: getPSH(10),
-            ),
-            Expanded(
-                child: ListView(
-              children: List.generate(
-                9,
-                (index) => Container(
-                  margin: EdgeInsets.symmetric(horizontal: getPSH(10)),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Pelada completa',
-                        style: TextStyle(fontSize: getPSH(16)),
-                      ),
-                      IconButton(
-                        icon: Icon(
-                          Icons.add,
-                          size: getPSH(23),
-                        ),
-                        onPressed: () {},
-                      ),
-                    ],
+            Text('$daySelectedString', style: TextStyle(fontSize: getPSH(15))),
+            SizedBox(height: getPSH(10)),
+            Row(
+              children: [
+                hourWidget(timeOfDay == null
+                    ? TimeOfDay.now().hour
+                    : timeOfDay.replacing(hour: timeOfDay.hourOfPeriod).hour),
+                SizedBox(width: getPSW(10)),
+                Text(':', style: TextStyle(fontSize: getPSH(22))),
+                SizedBox(width: getPSW(10)),
+                hourWidget(timeOfDay == null
+                    ? TimeOfDay.now().minute
+                    : timeOfDay.minute),
+                SizedBox(width: getPSW(10)),
+                hourWidget(timeOfDay == null
+                    ? TimeOfDay.now().period.toString().substring(10, 12)
+                    : timeOfDay.period.toString().substring(10, 12)),
+
+                // Text('${now.weekday.toString()}/18 | 5:50 PM',
+                //     style: TextStyle(fontSize: getPSH(20))),
+                Container(
+                  child: TextButton(
+                    onPressed: () async {
+                      // TimeOfDay timeofday;
+                      TimeOfDay timeofdayy = await showTimePicker(
+                        useRootNavigator: false,
+                        context: context,
+                        initialTime:
+                            timeOfDay == null ? TimeOfDay.now() : timeOfDay,
+                        initialEntryMode: TimePickerEntryMode.input,
+                        confirmText: "CONFIRM",
+                        cancelText: "NOT NOW",
+                        helpText: "BOOKING TIME",
+                      );
+                      if (timeofdayy != null) {
+                        setState(() {
+                          timeOfDay = timeofdayy;
+                        });
+                      }
+                    },
+                    child: Text('Cambiar'),
                   ),
                 ),
-              ),
-            )),
-            Divider(
-              thickness: 2,
+              ],
             ),
-            Container(
-                margin: EdgeInsets.all(getPSH(10)),
-                child: Column(
-                  children: [
-                    Text(
-                      'Selecionados',
-                      style: TextStyle(
-                          fontWeight: FontWeight.w500, fontSize: getPSH(16)),
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Text(
-                      'Selecionados',
-                      style: TextStyle(fontSize: 16),
-                    ),
-                  ],
-                ))
           ],
         ));
+  }
+
+  hourWidget(dynamic hour) {
+    return Container(
+      child:
+          Center(child: Text('$hour', style: TextStyle(fontSize: getPSH(20)))),
+      height: getPSH(50),
+      width: getPSW(40),
+      decoration: BoxDecoration(
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.2),
+            spreadRadius: 5,
+            blurRadius: 6,
+            offset: Offset(0, 3), // changes position of shadow
+          ),
+        ],
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(4),
+      ),
+    );
+  }
+
+  servicesSt(String data) {
+    Stream<StylistData> streamData =
+        Provider.of<CenterProivder>(context, listen: false).stylitys(data[1]);
+
+    print(streamData);
+
+    return StreamBuilder(
+        stream: streamData,
+        builder: (context, snapshot) {
+          print(snapshot.data);
+          return Container(
+              // padding: EdgeInsets.all(20),
+              height: getPSH(400),
+              width: double.infinity,
+              decoration: BoxDecoration(
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.2),
+                    spreadRadius: 5,
+                    blurRadius: 6,
+                    offset: Offset(0, 3), // changes position of shadow
+                  ),
+                ],
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(15),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    margin: EdgeInsets.all(10),
+                    child: Text(
+                      'Servicios',
+                      style: TextStyle(fontSize: getPSH(16)),
+                    ),
+                  ),
+                  Divider(
+                    thickness: 2,
+                  ),
+                  SizedBox(
+                    height: getPSH(10),
+                  ),
+                  Expanded(
+                      child: ListView(
+                    children: List.generate(
+                      9,
+                      (index) => Container(
+                        margin: EdgeInsets.symmetric(horizontal: getPSH(10)),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Pelada completa',
+                              style: TextStyle(fontSize: getPSH(16)),
+                            ),
+                            IconButton(
+                              icon: Icon(
+                                Icons.add,
+                                size: getPSH(23),
+                              ),
+                              onPressed: () {},
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  )),
+                  Divider(
+                    thickness: 2,
+                  ),
+                  Container(
+                      margin: EdgeInsets.all(getPSH(10)),
+                      child: Column(
+                        children: [
+                          Text(
+                            'Selecionados',
+                            style: TextStyle(
+                                fontWeight: FontWeight.w500,
+                                fontSize: getPSH(16)),
+                          ),
+                          SizedBox(
+                            height: 10,
+                          ),
+                          Text(
+                            'Selecionados',
+                            style: TextStyle(fontSize: 16),
+                          ),
+                        ],
+                      ))
+                ],
+              ));
+        });
   }
 
   confirmAlert() {

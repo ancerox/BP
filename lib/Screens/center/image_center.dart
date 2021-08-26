@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 
 import '../../size_config.dart';
 
-Widget imageCenter(CentersData center, BuildContext context) {
+Widget imageCenter(CentersData center, BuildContext context, Function pressed) {
   return SliverAppBar(
     iconTheme: IconThemeData(
       color: Colors.transparent, //change your color here
@@ -30,9 +30,7 @@ Widget imageCenter(CentersData center, BuildContext context) {
               height: getPSH(30),
             ),
             CustomBackButton(
-              pressd: () {
-                Navigator.pop(context);
-              },
+              pressd: pressed,
             ),
             Spacer(
               flex: 4,

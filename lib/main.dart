@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:bp/routes.dart';
 import 'package:bp/theme.dart';
 import 'package:bp/user_preferences.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -33,6 +34,19 @@ class MyApp extends StatelessWidget {
         )
       ],
       child: MaterialApp(
+        localizationsDelegates: [
+          // ... delegado[s] de localización específicos de la app aquí
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+        ],
+        supportedLocales: [
+          const Locale('en'), // Inglés
+          const Locale('es'), // Español
+          const Locale.fromSubtags(
+              languageCode:
+                  'zh'), // Chino *Mira Localizaciones avanzadas más abajo*
+          // ... otras regiones que la app soporte
+        ],
         routes: routes,
         debugShowCheckedModeBanner: false,
         theme: themedata(),
