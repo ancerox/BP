@@ -8,6 +8,8 @@ import '../../size_config.dart';
 class LobbyPage extends StatefulWidget {
   LobbyPage({Key key}) : super(key: key);
 
+  static String route = 'lobby';
+
   @override
   _LobbyPageState createState() => _LobbyPageState();
 }

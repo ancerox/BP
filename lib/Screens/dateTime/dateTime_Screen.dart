@@ -233,12 +233,7 @@ class _DateTimePageState extends State<DateTimePage>
                       fontWeight: FontWeight.w800,
                       color: Colors.white),
                 ),
-                Text(
-                    DateTime.now()
-                        .add(Duration(days: index))
-                        .day
-                        .toString()
-                        .substring(0, 2),
+                Text(DateTime.now().add(Duration(days: index)).day.toString(),
                     style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w600,
@@ -268,12 +263,7 @@ class _DateTimePageState extends State<DateTimePage>
                       fontWeight: FontWeight.w600,
                       color: Color(0xffCACACA)),
                 ),
-                Text(
-                    DateTime.now()
-                        .add(Duration(days: index))
-                        .day
-                        .toString()
-                        .substring(0, 2),
+                Text(DateTime.now().add(Duration(days: index)).day.toString(),
                     style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w500,

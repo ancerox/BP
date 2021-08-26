@@ -68,9 +68,13 @@ class CenterProivder with ChangeNotifier {
           name: data.get('name'),
           isActive: data.get('isActive'),
           photoUrl: data.get('photoUrl'),
-          availability: data.get('availability'),
-          services: data.get('services'));
+          availability: data.get('availability'));
+      // services: data.get('services'));
     });
+  }
+
+  Stream services(String stylistId) {
+    return stylistsCollection.doc(stylistId).collection('services').snapshots();
   }
 
   Stream apoiments(String stylistId) {

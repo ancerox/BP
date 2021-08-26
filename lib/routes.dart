@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'Screens/Register/Register_P.dart';
 import 'Screens/ServicesStylists/services_Stylists_page.dart';
 import 'Screens/dateTime/dateTime_Screen.dart';
+import 'Screens/lobby/lobby_page.dart';
 
 Map<String, WidgetBuilder> routes = {
   LoginPage.routeName: (_) => LoginPage(),
@@ -22,4 +23,5 @@ Map<String, WidgetBuilder> routes = {
   DateTimePage.route: (_) => DateTimePage(),
   ChatScreen.route: (_) => ChatScreen(),
   ServicesStylists.route: (_) => ServicesStylists(),
+  LobbyPage.route: (_) => LobbyPage(),
 };

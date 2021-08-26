@@ -1,6 +1,7 @@
 import 'package:bp/Components/BackButton.dart';
 
 import 'package:bp/Components/customButton.dart';
+import 'package:bp/Components/loadingWidget.dart';
 import 'package:bp/colors.dart';
 import 'package:bp/models/stylists.dart';
 import 'package:bp/services/centers_services.dart';
@@ -20,6 +21,8 @@ class ServicesStylists extends StatefulWidget {
 
 DateTime now = new DateTime.now();
 TimeOfDay timeOfDay;
+List selectedService = [];
+bool isSelected = false;
 
 class _ServicesStylistsState extends State<ServicesStylists> {
   @override
@@ -80,48 +83,44 @@ class _ServicesStylistsState extends State<ServicesStylists> {
           children: [
             Text('$daySelectedString', style: TextStyle(fontSize: getPSH(15))),
             SizedBox(height: getPSH(10)),
-            Row(
-              children: [
-                hourWidget(timeOfDay == null
-                    ? TimeOfDay.now().hour
-                    : timeOfDay.replacing(hour: timeOfDay.hourOfPeriod).hour),
-                SizedBox(width: getPSW(10)),
-                Text(':', style: TextStyle(fontSize: getPSH(22))),
-                SizedBox(width: getPSW(10)),
-                hourWidget(timeOfDay == null
-                    ? TimeOfDay.now().minute
-                    : timeOfDay.minute),
-                SizedBox(width: getPSW(10)),
-                hourWidget(timeOfDay == null
-                    ? TimeOfDay.now().period.toString().substring(10, 12)
-                    : timeOfDay.period.toString().substring(10, 12)),
+            GestureDetector(
+              onTap: () async {
+// TimeOfDay timeofday;
+                TimeOfDay timeofdayy = await showTimePicker(
+                  useRootNavigator: false,
+                  context: context,
+                  initialTime: timeOfDay == null ? TimeOfDay.now() : timeOfDay,
+                  initialEntryMode: TimePickerEntryMode.input,
+                  confirmText: "CONFIRM",
+                  cancelText: "NOT NOW",
+                  helpText: "BOOKING TIME",
+                );
+                if (timeofdayy != null) {
+                  setState(() {
+                    timeOfDay = timeofdayy;
+                  });
+                }
+              },
+              child: Row(
+                children: [
+                  hourWidget(timeOfDay == null
+                      ? TimeOfDay.now().hour
+                      : timeOfDay.replacing(hour: timeOfDay.hourOfPeriod).hour),
+                  SizedBox(width: getPSW(10)),
+                  Text(':', style: TextStyle(fontSize: getPSH(22))),
+                  SizedBox(width: getPSW(10)),
+                  hourWidget(timeOfDay == null
+                      ? TimeOfDay.now().minute
+                      : timeOfDay.minute),
+                  SizedBox(width: getPSW(10)),
+                  hourWidget(timeOfDay == null
+                      ? TimeOfDay.now().period.toString().substring(10, 12)
+                      : timeOfDay.period.toString().substring(10, 12)),
 
-                // Text('${now.weekday.toString()}/18 | 5:50 PM',
-                //     style: TextStyle(fontSize: getPSH(20))),
-                Container(
-                  child: TextButton(
-                    onPressed: () async {
-                      // TimeOfDay timeofday;
-                      TimeOfDay timeofdayy = await showTimePicker(
-                        useRootNavigator: false,
-                        context: context,
-                        initialTime:
-                            timeOfDay == null ? TimeOfDay.now() : timeOfDay,
-                        initialEntryMode: TimePickerEntryMode.input,
-                        confirmText: "CONFIRM",
-                        cancelText: "NOT NOW",
-                        helpText: "BOOKING TIME",
-                      );
-                      if (timeofdayy != null) {
-                        setState(() {
-                          timeOfDay = timeofdayy;
-                        });
-                      }
-                    },
-                    child: Text('Cambiar'),
-                  ),
-                ),
-              ],
+                  // Text('${now.weekday.toString()}/18 | 5:50 PM',
+                  //     style: TextStyle(fontSize: getPSH(20))),
+                ],
+              ),
             ),
           ],
         ));
@@ -149,96 +148,138 @@ class _ServicesStylistsState extends State<ServicesStylists> {
   }
 
   servicesSt(String data) {
-    Stream<StylistData> streamData =
-        Provider.of<CenterProivder>(context, listen: false).stylitys(data[1]);
-
-    print(streamData);
+    final streamData =
+        Provider.of<CenterProivder>(context, listen: false).services(data);
 
     return StreamBuilder(
         stream: streamData,
         builder: (context, snapshot) {
-          print(snapshot.data);
-          return Container(
-              // padding: EdgeInsets.all(20),
-              height: getPSH(400),
-              width: double.infinity,
-              decoration: BoxDecoration(
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.2),
-                    spreadRadius: 5,
-                    blurRadius: 6,
-                    offset: Offset(0, 3), // changes position of shadow
-                  ),
-                ],
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(15),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    margin: EdgeInsets.all(10),
-                    child: Text(
-                      'Servicios',
-                      style: TextStyle(fontSize: getPSH(16)),
+          if (snapshot.data != null) {
+            return Container(
+                // padding: EdgeInsets.all(20),
+                height: getPSH(400),
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.2),
+                      spreadRadius: 5,
+                      blurRadius: 6,
+                      offset: Offset(0, 3), // changes position of shadow
                     ),
-                  ),
-                  Divider(
-                    thickness: 2,
-                  ),
-                  SizedBox(
-                    height: getPSH(10),
-                  ),
-                  Expanded(
-                      child: ListView(
-                    children: List.generate(
-                      9,
-                      (index) => Container(
-                        margin: EdgeInsets.symmetric(horizontal: getPSH(10)),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'Pelada completa',
-                              style: TextStyle(fontSize: getPSH(16)),
-                            ),
-                            IconButton(
-                              icon: Icon(
-                                Icons.add,
-                                size: getPSH(23),
-                              ),
-                              onPressed: () {},
-                            ),
-                          ],
-                        ),
+                  ],
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      margin: EdgeInsets.all(getPSH(10)),
+                      child: Text(
+                        'Servicios',
+                        style: TextStyle(fontSize: getPSH(16)),
                       ),
                     ),
-                  )),
-                  Divider(
-                    thickness: 2,
-                  ),
-                  Container(
-                      margin: EdgeInsets.all(getPSH(10)),
-                      child: Column(
-                        children: [
-                          Text(
-                            'Selecionados',
-                            style: TextStyle(
-                                fontWeight: FontWeight.w500,
-                                fontSize: getPSH(16)),
+                    Divider(
+                      thickness: 2,
+                    ),
+                    SizedBox(
+                      height: getPSH(10),
+                    ),
+                    Expanded(
+                        child: ListView(
+                      children: List.generate(
+                        snapshot.data.docs.length,
+                        (index) => Container(
+                          margin: EdgeInsets.symmetric(horizontal: getPSH(10)),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                snapshot.data.docs[index]['servicio'],
+                                style: TextStyle(
+                                    fontSize: getPSH(16),
+                                    color: isSelected
+                                        ? Colors.grey[400]
+                                        : Colors.black),
+                              ),
+                              IconButton(
+                                  icon: Icon(
+                                    Icons.add,
+                                    size: getPSH(23),
+                                  ),
+                                  onPressed: isSelected
+                                      ? null
+                                      : () {
+                                          setState(() {
+                                            selectedService.add(snapshot
+                                                .data.docs[index]['servicio']);
+                                          });
+                                          if (snapshot.data.docs[index]
+                                                  ['servicio'] ==
+                                              selectedService[0]) {
+                                            isSelected = true;
+                                          } else {
+                                            return;
+                                          }
+                                        }),
+                            ],
                           ),
-                          SizedBox(
-                            height: 10,
-                          ),
-                          Text(
-                            'Selecionados',
-                            style: TextStyle(fontSize: 16),
-                          ),
-                        ],
-                      ))
-                ],
-              ));
+                        ),
+                      ),
+                    )),
+                    Divider(
+                      thickness: 2,
+                    ),
+                    Container(
+                        // height: getPSH(100),
+                        margin: EdgeInsets.all(getPSH(10)),
+                        child: Column(
+                          children: [
+                            Align(
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                'Selecionados',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: getPSH(16)),
+                              ),
+                            ),
+                            SizedBox(height: getPSH(5)),
+                            selectedService.isEmpty
+                                ? Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: Text(
+                                      'Sin Seleccion',
+                                      style: TextStyle(fontSize: 16),
+                                    ),
+                                  )
+                                : Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        selectedService[0],
+                                        style: TextStyle(fontSize: 16),
+                                      ),
+                                      IconButton(
+                                          onPressed: () {
+                                            setState(() {
+                                              selectedService.clear();
+                                              isSelected = false;
+                                            });
+                                          },
+                                          icon: Icon(Icons.delete)),
+                                    ],
+                                  )
+                          ],
+                        ))
+                  ],
+                ));
+          } else {
+            return LoadingWidget();
+          }
         });
   }
 
@@ -299,7 +340,9 @@ class _ServicesStylistsState extends State<ServicesStylists> {
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
                               TextButton(
-                                  onPressed: () {},
+                                  onPressed: () {
+                                    Navigator.pushNamed(context, 'lobby');
+                                  },
                                   child: Container(
                                       child: Center(
                                           child: Text(
@@ -316,7 +359,9 @@ class _ServicesStylistsState extends State<ServicesStylists> {
                                               BorderRadius.circular(9),
                                           color: kSecundary))),
                               TextButton(
-                                  onPressed: () {},
+                                  onPressed: () {
+                                    print('work');
+                                  },
                                   child: Container(
                                       child: Center(
                                         child: Text(
