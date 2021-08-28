@@ -13,6 +13,7 @@ class CenterProivder with ChangeNotifier {
 
   String centerId = '';
   String chatroomPass = '';
+  String stylistName = '';
 
   final CollectionReference userCollections =
       FirebaseFirestore.instance.collection('user');

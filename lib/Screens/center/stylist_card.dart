@@ -1,6 +1,8 @@
 import 'package:bp/models/stylists.dart';
+import 'package:bp/services/centers_services.dart';
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../colors.dart';
 import '../../size_config.dart';
@@ -16,6 +18,8 @@ class StylistsCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final List stylistList = [data, stylistId];
+
+    Provider.of<CenterProivder>(context).stylistName = data.name;
 
     return InkWell(
       onTap: onTap,

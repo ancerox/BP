@@ -47,11 +47,15 @@ class _ServicesStylistsState extends State<ServicesStylists> {
               Expanded(flex: 1, child: Container()),
 
               CustomButton(
-                  text: 'Confirmar Servicio',
-                  context: context,
-                  pressd: () {
-                    confirmAlert();
-                  })
+                color: isSelected ? null : Colors.grey,
+                text: 'Confirmar Servicio',
+                context: context,
+                pressd: isSelected
+                    ? () {
+                        confirmAlert(data[0]);
+                      }
+                    : null,
+              )
             ],
           ),
         ),
@@ -283,7 +287,10 @@ class _ServicesStylistsState extends State<ServicesStylists> {
         });
   }
 
-  confirmAlert() {
+  confirmAlert(data) {
+    String stylistName =
+        Provider.of<CenterProivder>(context, listen: false).stylistName;
+
     showDialog(
         barrierDismissible: true,
         context: context,
@@ -327,7 +334,7 @@ class _ServicesStylistsState extends State<ServicesStylists> {
                         Container(
                           margin: EdgeInsets.symmetric(horizontal: getPSW(20)),
                           child: Text(
-                            'Vas a agendar un turno con Maria \nGuzman a las 9:00 Am. Es necesario que estes 10 minutos antes de la hora acordada',
+                            'Vas a agendar un ${selectedService[0]} con $stylistName el ${DateFormat('EEEE dd').format(data)} a las ${timeOfDay == null ? DateTime.now().hour : timeOfDay.hour}. Es necesario que estes 10 minutos antes de la hora acordada',
                             style: TextStyle(
                                 // fontWeight: FontWeight.w600,
                                 fontSize: getPSW(14)),

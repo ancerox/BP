@@ -9,11 +9,13 @@ class CustomButton extends StatelessWidget {
     @required this.text,
     @required this.context,
     @required this.pressd,
+    this.color,
   }) : super(key: key);
 
   final BuildContext context;
   final Function pressd;
   final String text;
+  final Color color;
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +25,8 @@ class CustomButton extends StatelessWidget {
           width: getPSW(320),
           height: getPSH(50),
           decoration: BoxDecoration(
-              color: kSecundary, borderRadius: BorderRadius.circular(20)),
+              color: color == null ? kSecundary : color,
+              borderRadius: BorderRadius.circular(20)),
           child: Center(
             child: Text(
               text,

@@ -78,7 +78,7 @@ class _DateTimePageState extends State<DateTimePage>
                   Navigator.pushNamed(
                     context,
                     'stylistServices',
-                    arguments: [dateTime, stylistId],
+                    arguments: [dateTime, stylistId, stylist],
                   );
                 },
                 child: Container(
