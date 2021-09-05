@@ -19,6 +19,7 @@ class StylistsCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final List stylistList = [data, stylistId];
 
+    //saving name of Stylist
     Provider.of<CenterProivder>(context).stylistName = data.name;
 
     return InkWell(

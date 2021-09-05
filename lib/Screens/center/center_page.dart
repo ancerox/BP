@@ -25,6 +25,7 @@ final prefs = UserPreferences();
 
 String stylistId;
 bool isSelected = false;
+StylistData stylisyData;
 
 @override
 void initState() {}
@@ -57,7 +58,7 @@ class _CenterPageState extends State<CenterPage> {
                 onPressed: isSelected
                     ? () {
                         Navigator.pushNamed(context, 'dataTime',
-                            arguments: stylistId);
+                            arguments: [stylistId, stylisyData]);
                         setState(() {
                           isSelected = false;
                         });
@@ -136,6 +137,7 @@ class _CenterPageState extends State<CenterPage> {
                 return StylistsCard(
                   onTap: () {
                     setState(() {
+                      stylisyData = snap.data;
                       isSelected = true;
                       stylistId = centersData.stylists[index];
                     });

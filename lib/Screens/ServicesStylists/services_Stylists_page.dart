@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_time_picker_spinner/flutter_time_picker_spinner.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:bp/models/apoiment_model.dart';
 
 class ServicesStylists extends StatefulWidget {
   ServicesStylists({Key key}) : super(key: key);
@@ -23,11 +24,16 @@ DateTime now = new DateTime.now();
 TimeOfDay timeOfDay;
 List selectedService = [];
 bool isSelected = false;
+Apoiment apoiment;
+DateTime apoimentDate;
 
 class _ServicesStylistsState extends State<ServicesStylists> {
   @override
   Widget build(BuildContext context) {
     List data = ModalRoute.of(context).settings.arguments;
+
+    DateTime dateOfApoiment = now.add(Duration(days: data[0]));
+
     Intl.defaultLocale = 'es';
 
     return Scaffold(
@@ -40,7 +46,7 @@ class _ServicesStylistsState extends State<ServicesStylists> {
               appBar(),
               Spacer(),
               //
-              setHour(timeOfDay, data[0]),
+              setHour(timeOfDay, dateOfApoiment),
               Spacer(),
               //
               Expanded(flex: 7, child: servicesSt(data[1])),
@@ -52,7 +58,7 @@ class _ServicesStylistsState extends State<ServicesStylists> {
                 context: context,
                 pressd: isSelected
                     ? () {
-                        confirmAlert(data[0]);
+                        confirmAlert(data, dateOfApoiment);
                       }
                     : null,
               )
@@ -217,12 +223,13 @@ class _ServicesStylistsState extends State<ServicesStylists> {
                                       ? null
                                       : () {
                                           setState(() {
-                                            selectedService.add(snapshot
-                                                .data.docs[index]['servicio']);
+                                            selectedService
+                                                .add(snapshot.data.docs[index]);
                                           });
+
                                           if (snapshot.data.docs[index]
                                                   ['servicio'] ==
-                                              selectedService[0]) {
+                                              selectedService[0]['servicio']) {
                                             isSelected = true;
                                           } else {
                                             return;
@@ -264,7 +271,7 @@ class _ServicesStylistsState extends State<ServicesStylists> {
                                         MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
-                                        selectedService[0],
+                                        selectedService[0]['servicio'],
                                         style: TextStyle(fontSize: 16),
                                       ),
                                       IconButton(
@@ -287,9 +294,8 @@ class _ServicesStylistsState extends State<ServicesStylists> {
         });
   }
 
-  confirmAlert(data) {
-    String stylistName =
-        Provider.of<CenterProivder>(context, listen: false).stylistName;
+  confirmAlert(data, dateOfApoiment) {
+    final provider = Provider.of<CenterProivder>(context, listen: false);
 
     showDialog(
         barrierDismissible: true,
@@ -334,7 +340,7 @@ class _ServicesStylistsState extends State<ServicesStylists> {
                         Container(
                           margin: EdgeInsets.symmetric(horizontal: getPSW(20)),
                           child: Text(
-                            'Vas a agendar un ${selectedService[0]} con $stylistName el ${DateFormat('EEEE dd').format(data)} a las ${timeOfDay == null ? DateTime.now().hour : timeOfDay.hour}. Es necesario que estes 10 minutos antes de la hora acordada',
+                            'Vas a agendar un ${selectedService[0]['servicio']} con ${provider.stylistName} el ${DateFormat('EEEE dd').format(dateOfApoiment)} a las ${timeOfDay == null ? DateTime.now().hour : timeOfDay.hour}. Es necesario que estes 10 minutos antes de la hora acordada',
                             style: TextStyle(
                                 // fontWeight: FontWeight.w600,
                                 fontSize: getPSW(14)),
@@ -348,7 +354,46 @@ class _ServicesStylistsState extends State<ServicesStylists> {
                             children: [
                               TextButton(
                                   onPressed: () {
-                                    Navigator.pushNamed(context, 'lobby');
+                                    Apoiment apoiment = Apoiment(
+                                      stylistName: provider.stylistName,
+                                      price: selectedService[0]['precio']
+                                          .toString(),
+                                      timeInMinutes: selectedService[0]
+                                          ['tiempo'],
+                                      service: selectedService[0]['servicio'],
+                                      startAt: DateTime(
+                                        DateTime.now().year,
+                                        DateTime.now().month,
+                                        DateTime.now()
+                                            .add(
+                                              Duration(days: data[0]),
+                                            )
+                                            .day,
+                                        timeOfDay.hour,
+                                        timeOfDay.minute,
+                                      ),
+                                      finishAt: DateTime(
+                                        DateTime.now().year,
+                                        DateTime.now().month,
+                                        DateTime.now()
+                                            .add(
+                                              Duration(days: data[0]),
+                                            )
+                                            .day,
+                                        timeOfDay.hour,
+                                        timeOfDay.minute +
+                                            selectedService[0]['tiempo'],
+                                      ),
+                                    );
+                                    print(data[1]);
+                                    provider.makeApoiment(data[1], apoiment);
+
+                                    Navigator.pushNamed(context, 'lobby',
+                                        arguments: [
+                                          selectedService[0],
+                                          data[0],
+                                          timeOfDay
+                                        ]);
                                   },
                                   child: Container(
                                       child: Center(

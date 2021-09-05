@@ -38,7 +38,12 @@ class UserServices with ChangeNotifier {
 
       // save user collections
 
-      userCollections.doc(user.uid).set({"name": name, "cellPhone": phoneNum});
+      userCollections.doc(user.uid).set({
+        "name": name,
+        "cellPhone": phoneNum,
+        "stylistIdCurrentApoiment": null,
+        "centers": []
+      });
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
         print('The password provided is too weak.');
@@ -135,6 +140,8 @@ class UserServices with ChangeNotifier {
       id: auth.currentUser.uid,
       name: snaphot['name'],
       cellPhone: snaphot['cellPhone'],
+      stylistIdCurrentApoiment: snaphot['stylistIdCurrentApoiment'],
+      centers: snaphot['centers'],
     );
   }
 

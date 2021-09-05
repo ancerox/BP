@@ -57,12 +57,14 @@ class _DateTimePageState extends State<DateTimePage>
   int day = 0;
   @override
   Widget build(BuildContext context) {
-    String stylistId = ModalRoute.of(context).settings.arguments;
+    List stylistData = ModalRoute.of(context).settings.arguments;
     final provider = Provider.of<CenterProivder>(context);
 
-    Stream<StylistData> stylist = provider.stylitys(stylistId);
+    Stream<StylistData> stylist = provider.stylitys(stylistData[0]);
 
 //  StylistData provider = Provider.of<CenterProivder>(context).stylitys(modalRoute);
+
+    print(day);
 
     SizeConfig().init(context);
     return DefaultTabController(
@@ -78,7 +80,7 @@ class _DateTimePageState extends State<DateTimePage>
                   Navigator.pushNamed(
                     context,
                     'stylistServices',
-                    arguments: [dateTime, stylistId, stylist],
+                    arguments: [day, stylistData[0], stylist],
                   );
                 },
                 child: Container(
@@ -124,7 +126,7 @@ class _DateTimePageState extends State<DateTimePage>
           child: Column(
             children: [
               //
-              appbar(context, 'Servicios en lista de', stylist),
+              appbar(context, 'Servicios en lista de', stylistData[1].name),
               SizedBox(
                 height: getPSH(20),
               ),
@@ -196,7 +198,8 @@ class _DateTimePageState extends State<DateTimePage>
 
                         if (day == index) {
                           return DayDateBuilder(
-                              stream: provider.apoiments(stylistId), day: day);
+                              stream: provider.apoiments(stylistData[0]),
+                              day: day);
                         } else {
                           return Container();
                         }

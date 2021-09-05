@@ -252,7 +252,7 @@ class _InputsRegisterState extends State<InputsRegister> {
     await provider.registerUser(
         _emailController.text, repeatPassCtrl.text, _nameCtrl.text);
 
-    Navigator.popAndPushNamed(context, HomePage.route);
+    Navigator.pushReplacementNamed(context, HomePage.route);
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       duration: Duration(seconds: 3),
       backgroundColor: kPrimeryColor,

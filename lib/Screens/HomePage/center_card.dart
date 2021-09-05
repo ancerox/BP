@@ -94,7 +94,7 @@ class CenterCard extends StatelessWidget {
             Align(
               alignment: Alignment.bottomRight,
               child: Container(
-                margin: EdgeInsets.only(left: getPSH(40), bottom: getPSH(20)),
+                margin: EdgeInsets.only(left: getPSH(20), bottom: getPSH(20)),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [

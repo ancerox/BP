@@ -5,7 +5,7 @@ import '../colors.dart';
 import '../size_config.dart';
 import 'BackButton.dart';
 
-Widget appbar(BuildContext context, String text, Stream stylistStreamData) {
+Widget appbar(BuildContext context, String text, String stylistName) {
   SizeConfig().init(context);
   return Row(
     children: [
@@ -24,15 +24,10 @@ Widget appbar(BuildContext context, String text, Stream stylistStreamData) {
                 color: kPrimeryColor,
                 fontWeight: FontWeight.w800),
           ),
-          StreamBuilder<StylistData>(
-              stream: stylistStreamData,
-              builder: (context, snapshot) {
-                return Text(
-                  snapshot.data != null ? snapshot.data.name : '#####',
-                  style: TextStyle(
-                      fontSize: getPSW(15), fontWeight: FontWeight.w500),
-                );
-              })
+          Text(
+            stylistName,
+            style: TextStyle(fontSize: getPSW(15), fontWeight: FontWeight.w500),
+          ),
         ],
       ),
       Spacer(

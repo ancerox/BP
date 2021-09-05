@@ -1,8 +1,6 @@
-import 'dart:math';
-
+import 'package:bp/models/apoiment_model.dart';
 import 'package:bp/models/beauty_centers.dart';
-import 'package:bp/models/chatmodel.dart';
-import 'package:bp/models/data_time.dart';
+
 import 'package:bp/models/stylists.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -43,7 +41,7 @@ class CenterProivder with ChangeNotifier {
   }
 
   addCenter(String centerId) async {
-    await centersCollection
+    return await centersCollection
         .where('centerId', isEqualTo: centerId)
         .get()
         .then((center) {
@@ -51,8 +49,7 @@ class CenterProivder with ChangeNotifier {
         loadcenter(centerId);
         return true;
       } else {
-        print('El centor no existe');
-        return false;
+        return null;
       }
     });
   }
@@ -130,6 +127,43 @@ class CenterProivder with ChangeNotifier {
 
   Stream defaultAb(String stylistId) {
     return stylistsCollection.doc(stylistId).snapshots();
+  }
+
+  makeApoiment(String stylistId, Apoiment apoiment) {
+    //save id of the stylist
+    print(stylistId);
+    userCollections.doc(uid).update({
+      'stylistIdCurrentApoiment': stylistId,
+    });
+
+    return stylistsCollection.doc(stylistId).collection('apoiments').add({
+      'hour': apoiment.startAt,
+      'finishAt': apoiment.finishAt,
+      'service': apoiment.service,
+      'timeInMinutes': apoiment.timeInMinutes,
+      'userId': uid,
+      'stylistName': apoiment.stylistName,
+      'price': apoiment.price,
+    });
+  }
+
+  Stream currentApoiment(
+    String stylistId,
+  ) {
+    return stylistsCollection
+        .doc(stylistId)
+        .collection('apoiments')
+        .where('userId', isEqualTo: uid.toString())
+        .snapshots();
+
+    //   .then((value) {
+    // if (value.docs.length > 0) {
+    //   print('work');
+    //   return value;
+    // } else {
+    //   return null;
+    // }
+    // });
   }
 }
 //  return Apoiment(dateTime: data.docs);

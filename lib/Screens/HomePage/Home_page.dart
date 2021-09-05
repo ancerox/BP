@@ -2,10 +2,11 @@ import 'package:bp/Screens/HomePage/drawer.dart';
 import 'package:bp/services/user_services.dart';
 import 'package:bp/size_config.dart';
 import 'package:bp/services/centers_services.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:flutter_svg/svg.dart';
 
 import 'package:provider/provider.dart';
 
-import 'package:bp/Components/loadingWidget.dart';
 import 'package:bp/Screens/HomePage/center_card.dart';
 import 'package:bp/Screens/center/center_page.dart';
 import 'package:bp/colors.dart';
@@ -13,11 +14,13 @@ import 'package:bp/models/beauty_centers.dart';
 
 import 'package:bp/models/user_models.dart';
 import 'package:flutter/material.dart';
+import 'package:showcaseview/showcaseview.dart';
 import 'no_centters_added.dart';
 
 TextEditingController centerCodeCtr = TextEditingController();
 
 final GlobalKey<ScaffoldState> _scafoldKey = GlobalKey<ScaffoldState>();
+bool isFirstTime;
 
 class HomePage extends StatefulWidget {
   static String route = 'home';
@@ -25,21 +28,38 @@ class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
+GlobalKey keyOne = GlobalKey();
+
 class _HomePageState extends State<HomePage> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback(
+        (_) => ShowCaseWidget.of(context).startShowCase([keyOne]));
+  }
+
   @override
   Widget build(BuildContext context) {
     SizeConfig().init(context);
+
     return Scaffold(
       drawer: MainDrawer(),
       key: _scafoldKey,
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: kPrimeryColor,
-        onPressed: () {
-          addCenter();
-        },
-        child: Icon(
-          Icons.add,
-          size: getPSW(35),
+      floatingActionButton: Showcase(
+        showArrow: true,
+        shapeBorder: CircleBorder(),
+        description: 'Agrega tu primer centro de belleza',
+        key: keyOne,
+        child: FloatingActionButton(
+          backgroundColor: kPrimeryColor,
+          onPressed: () {
+            // addedSucces();
+            addCenter();
+          },
+          child: Icon(
+            Icons.add,
+            size: getPSW(35),
+          ),
         ),
       ),
       body: SafeArea(child: body()),
@@ -97,7 +117,7 @@ class _HomePageState extends State<HomePage> {
               style: TextStyle(),
               children: <TextSpan>[
                 TextSpan(
-                  text: 'Buenos dias\n',
+                  text: 'Buenos Noches\n',
                   // textAlign: TextAlign.right,
                   style: TextStyle(
                       color: kLightColor,
@@ -107,7 +127,7 @@ class _HomePageState extends State<HomePage> {
                       fontSize: getPSH(27)),
                 ),
                 TextSpan(
-                  text: snapshot.data.name,
+                  text: 'Juan',
                   style: TextStyle(
                       color: Colors.black,
                       fontStyle: FontStyle.normal,
@@ -158,33 +178,41 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget pendding() {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 20),
-      height: getPSH(80),
-      width: getPSW(305),
-      decoration: BoxDecoration(boxShadow: [
-        BoxShadow(
-          spreadRadius: 0,
-          offset: Offset(0, 1),
-          blurRadius: 9.0,
-          color: Colors.grey[350],
-        )
-      ], borderRadius: BorderRadius.circular(getPSH(20)), color: kLightBlueC),
-      child: Align(
-          alignment: Alignment.centerLeft,
-          child: RichText(
-            text: TextSpan(children: [
-              TextSpan(
-                text: 'Aun no tienes citas\n',
-                style: TextStyle(color: kLightColor, fontSize: getPSH(18)),
-              ),
-              TextSpan(
-                text: 'Pendientes',
-                style: TextStyle(color: Colors.black, fontSize: getPSH(18)),
-              ),
-            ]),
-          )),
-    );
+    final userProvider = Provider.of<UserServices>(context);
+    final centerProvider = Provider.of<CenterProivder>(context);
+
+    return StreamBuilder<UserData>(
+        stream: userProvider.userData,
+        builder: (context, snapshot) {
+          if (snapshot.data != null) {
+            return StreamBuilder(
+                stream: centerProvider.currentApoiment(
+                  snapshot.data.stylistIdCurrentApoiment,
+                ),
+                builder: (context, snapshot) {
+                  if (snapshot.data != null && snapshot.data.docs.length > 0) {
+                    final data = snapshot.data.docs[0];
+                    return InkWell(
+                      onTap: () {
+                        Navigator.pushNamed(context, 'lobby', arguments: data);
+                      },
+                      child: PeddingWidget(
+                        // stylisyImage: ,
+                        isLoading: false,
+                        text: 'Tienes un Turno con \n',
+                        text2: data['stylistName'],
+                      ),
+                    );
+                  } else {
+                    return PeddingWidget(
+                        isLoading: false, text: 'No hay turnos Agendados');
+                  }
+                });
+          } else {
+            return PeddingWidget(
+                isLoading: true, text: 'No hay turnos Agendados');
+          }
+        });
   }
 
   Widget centers() {
@@ -194,7 +222,8 @@ class _HomePageState extends State<HomePage> {
       stream: provider.centerIds,
       builder: (context, snap) {
         if (snap.data != null) {
-          if (snap.data.length > 0) {
+          //Todo: change the path of the Stream Provider
+          if (snap.data.isNotEmpty) {
             return Column(
               children: List.generate(
                   snap.data.length,
@@ -259,30 +288,36 @@ class _HomePageState extends State<HomePage> {
                   ),
                   Column(
                     children: [
-                      Expanded(
-                          child: Text(
-                        'Agrega tu centro de belleza',
+                      Text(
+                        'Codigo de tu centro de belleza',
                         style: TextStyle(
                             fontWeight: FontWeight.w600, fontSize: getPSH(14)),
-                      )),
-                      Expanded(
-                          child: TextField(
+                      ),
+                      TextField(
                         style: TextStyle(fontSize: getPSH(20)),
                         controller: centerCodeCtr,
-                      )),
-                      Expanded(
-                          child: Container(
+                      ),
+                      Spacer(flex: 2),
+                      Container(
+                        height: getPSH(35),
                         decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(getPSH(15)),
-                            color: kSecundary),
-                        width: double.infinity,
+                            borderRadius: BorderRadius.circular(getPSH(20)),
+                            color: kPrimeryColor),
+                        width: getPSW(150),
                         child: TextButton(
                           onPressed: () {
                             final provider = Provider.of<CenterProivder>(
                                 context,
                                 listen: false);
 
-                            provider.addCenter(centerCodeCtr.text);
+                            provider.addCenter(centerCodeCtr.text).then((e) {
+                              if (e == null) {
+                                // TODO: handel not center found
+                              } else {
+                                Navigator.pop(context);
+                                addedSucces();
+                              }
+                            });
                           },
                           child: Text('Agregar',
                               style: TextStyle(
@@ -290,11 +325,126 @@ class _HomePageState extends State<HomePage> {
                                   color: Colors.white,
                                   fontWeight: FontWeight.w600)),
                         ),
-                      )),
+                      ),
                     ],
                   ),
                 ]),
               ));
         });
+  }
+
+  addedSucces() {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(20.0))),
+              content: Container(
+                decoration: BoxDecoration(),
+                width: getPSW(300),
+                height: getPSH(150),
+                child: Stack(
+                  children: [
+                    Align(
+                      // These values are based on trial & error method
+                      alignment: Alignment(0, -5.5),
+                      child: SvgPicture.asset(
+                        'assets/icons/success.svg',
+                        width: getPSW(120),
+                        height: getPSH(120),
+                      ),
+                    ),
+                    Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SizedBox(height: getPSH(60)),
+                          Text('Centro Valido',
+                              style: TextStyle(
+                                  fontSize: getPSH(18),
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.w600)),
+                          SizedBox(height: getPSH(5)),
+                          Text('Centro de belleza agreado!'),
+                          TextButton(
+                            child: Text('Ok!'),
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                          ),
+                        ],
+                      ),
+                    )
+                  ],
+                ),
+              ));
+        });
+  }
+}
+
+class PeddingWidget extends StatelessWidget {
+  const PeddingWidget({
+    Key key,
+    this.text,
+    this.isLoading,
+    this.text2,
+    this.stylisyImage,
+  }) : super(key: key);
+
+  final String text;
+  final bool isLoading;
+  final String text2;
+  final String stylisyImage;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 20),
+      height: getPSH(80),
+      width: getPSW(305),
+      decoration: BoxDecoration(boxShadow: [
+        BoxShadow(
+          spreadRadius: 0,
+          offset: Offset(0, 1),
+          blurRadius: 9.0,
+          color: Colors.grey[350],
+        )
+      ], borderRadius: BorderRadius.circular(getPSH(20)), color: kLightBlueC),
+      child: isLoading
+          ? SpinKitWave(
+              color: Colors.white,
+              size: 50.0,
+            )
+          : Row(
+              children: [
+                Align(
+                    alignment: Alignment.centerLeft,
+                    child: RichText(
+                      text: TextSpan(children: [
+                        TextSpan(
+                          text: text,
+                          style: TextStyle(
+                              color: kLightColor, fontSize: getPSH(18)),
+                        ),
+                        TextSpan(
+                          text: text2,
+                          style: TextStyle(
+                              color: Colors.black, fontSize: getPSH(18)),
+                        ),
+                      ]),
+                    )),
+                // Spacer(),
+                // isLoading
+                //     ? Container()
+                //     : CircleAvatar(
+                //         maxRadius: 30.0,
+                //         child: Image(
+                //           image: AssetImage(stylisyImage),
+                //         ),
+                //       )
+              ],
+            ),
+    );
   }
 }

@@ -45,10 +45,14 @@ class _DayDateBuilderState extends State<DayDateBuilder>
               if (item['hour'].toDate().day == now.day) {
                 apoiments.add(item);
               }
+              // print(DateTime.now().isAfter(item['hour'].toDate()));
+              // print(item['hour'].toDate() );
+              // DateTime.now().is
+              print(apoiments);
 
-              if (item['hour'].toDate().isAtSameMomentAs(now) ||
-                  item['hour'].toDate().isAfter(now) ||
-                  now.isBefore(item['finishAt'].toDate())) {
+              if (item['hour'].toDate().isBefore(now) &&
+                      item['finishAt'].toDate().isAfter(now) ||
+                  item['hour'].toDate().isAtSameMomentAs(now)) {
                 return Column(
                   children: [
                     Container(
@@ -70,8 +74,8 @@ class _DayDateBuilderState extends State<DayDateBuilder>
               }
             }
 
-            if (apoiments.isEmpty ||
-                apoiments[0]['hour'].toDate().isBefore(now)) {
+            if (apoiments.isEmpty) {
+              //Todo: do not show apoiments thats after hours
               return Column(
                 children: [
                   Container(
